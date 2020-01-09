@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-CONFIG   += c++1z
+CONFIG   += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -50,6 +50,45 @@ FORMS += \
 
 RESOURCES += \
     src/qtWidgets/icons/icons.qrc
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lavcodec
+
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lavdevice
+
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lavfilter
+
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lavformat
+
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lavutil
+
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lpostproc
+
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lswresample
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+
+win32: LIBS += -L$$PWD/windows/ffmpeg-4.2.1-win64-dev/lib/ -lswscale
+INCLUDEPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
+DEPENDPATH += $$PWD/windows/ffmpeg-4.2.1-win64-dev/include
 
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += libavcodec

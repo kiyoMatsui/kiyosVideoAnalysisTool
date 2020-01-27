@@ -31,7 +31,7 @@ INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty/catch") #catch.hpp
 ## example project Sources
 FILE(GLOB_RECURSE EXAMPLE_SRCS01 ${MAINFOLDER}/src/*.cpp ${MAINFOLDER}/src/qtWidgets/*.ui ${MAINFOLDER}/src/qtWidgets/*.qrc)
 
-find_package(Qt5 COMPONENTS Widgets PrintSupport Network REQUIRED)
+find_package(Qt5 COMPONENTS Widgets PrintSupport Network Multimedia REQUIRED)
 
 if(Qt5Widgets_FOUND)
     message("-- Found Qt5")
@@ -115,7 +115,7 @@ ENDIF()
 
 
 ## Creating Binaries for examples
-SET(PROJECT_LIBS ${CMAKE_DL_LIBS} Qt5::Widgets Qt5::Network ${FFMPEG_LIBRARIES_TMP}) 
+SET(PROJECT_LIBS ${CMAKE_DL_LIBS} Qt5::Widgets Qt5::Network Qt5::Multimedia ${FFMPEG_LIBRARIES_TMP}) 
 
 SET(EXAMPLE1_NAME ${APPLICATION_NAME})
 SET(EXAMPLE1_BIN ${EXAMPLE1_NAME})

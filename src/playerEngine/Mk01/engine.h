@@ -265,6 +265,6 @@ private:
   std::atomic<bool> endFlag;
 };
 
-} // namespace mk01
+} // namespace Mk01
 
 #endif

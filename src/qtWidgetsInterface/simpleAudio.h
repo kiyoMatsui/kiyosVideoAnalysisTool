@@ -8,7 +8,7 @@
 #include <thread>
 #include "simpleAudioIO.h"
 #include "ffmpegUPtr.h"
-#include "mk01/engine.h"
+#include "Mk01/engine.h"
 
 class simpleAudio : public QObject
 {

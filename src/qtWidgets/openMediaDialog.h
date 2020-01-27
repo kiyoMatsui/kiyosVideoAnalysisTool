@@ -9,26 +9,25 @@ class openMediaDialog;
 
 class openMediaDialog : public QDialog
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit openMediaDialog(QWidget *parent = 0);
-    ~openMediaDialog();
+  explicit openMediaDialog(QWidget *parent = 0);
+  ~openMediaDialog();
 
 public slots:
-    void setMediaSource(QString aString);
+  void setMediaSource(QString aString);
 
 signals:
-    void returnMediaSource(QString aMediaSource);
+  void returnMediaSource(QString aMediaSource);
 
 private slots:
-    void on_buttonBox_accepted();
+  void on_buttonBox_accepted();
 
-
-    void on_toolButton_clicked();
+  void on_toolButton_clicked();
 
 private:
-    Ui::openMediaDialog *ui;
+  Ui::openMediaDialog *ui;
 };
 
 #endif // OPENMEDIADIALOG_H

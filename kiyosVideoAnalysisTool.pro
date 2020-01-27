@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui multimedia
 CONFIG   += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -26,6 +26,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 INCLUDEPATH += src/qtWidgetsInterface/
 INCLUDEPATH += src/qtWidgets/
 INCLUDEPATH += src/ffmpegUtil/
+INCLUDEPATH += src/playerEngine/
 INCLUDEPATH += thirdParty/
 
 SOURCES += \
@@ -33,20 +34,32 @@ SOURCES += \
         src/qtWidgets/mainWindow.cpp \
     src/qtWidgets/av_dump_format_form.cpp \
     src/qtWidgets/openMediaDialog.cpp \
-    src/qtWidgetsInterface/avDumpFormat.cpp
+    src/qtWidgetsInterface/avDumpFormat.cpp \
+    src/qtWidgetsInterface/simplePlaybackForm.cpp \
+    src/qtWidgetsInterface/simpleDisplay.cpp \
+    src/qtWidgetsInterface/simpleAudio.cpp \
+    src/qtWidgetsInterface/simpleAudioIO.cpp \
 
 HEADERS += \
+    src/ffmpegUtil/openglVariables.h \
         src/qtWidgets/mainWindow.h \
     src/qtWidgets/av_dump_format_form.h \
+    src/qtWidgets/mainWindowDialogs.h \
     src/qtWidgets/openMediaDialog.h \
     src/qtWidgetsInterface/avDumpFormat.h \
     src/ffmpegUtil/customExceptions.h \
-    src/ffmpegUtil/ffmpegUPtr.h
+    src/ffmpegUtil/ffmpegUPtr.h \
+    src/playerEngine/Mk01/engine.h \
+    src/qtWidgetsInterface/simplePlaybackForm.h \
+    src/qtWidgetsInterface/simpleDisplay.h \
+    src/qtWidgetsInterface/simpleAudio.h \
+    src/qtWidgetsInterface/simpleAudioIO.h
 
 FORMS += \
         src/qtWidgets/mainWindow.ui \
     src/qtWidgets/av_dump_format_form.ui \
-    src/qtWidgets/openMediaDialog.ui
+    src/qtWidgets/openMediaDialog.ui \
+    src/qtWidgetsInterface/simplePlaybackForm.ui
 
 RESOURCES += \
     src/qtWidgets/icons/icons.qrc

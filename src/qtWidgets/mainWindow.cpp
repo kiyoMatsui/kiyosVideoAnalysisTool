@@ -1,24 +1,24 @@
 #include "mainWindow.h"
+#include "mainWindowDialogs.h"
 #include "ui_mainWindow.h"
+#include "customExceptions.h"
 #include "openMediaDialog.h"
 #include "av_dump_format_form.h"
 #include "avDumpFormat.h"
-#include "customExceptions.h"
+#include "simplePlaybackForm.h"
 
 #include <QInputDialog>
 #include <QLineEdit>
 #include <memory>
 
 mainWindow::mainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::mainWindow)
-{
-    ui->setupUi(this);
+  QMainWindow(parent),
+  ui(new Ui::mainWindow) {
+  ui->setupUi(this);
 }
 
-mainWindow::~mainWindow()
-{
-    delete ui;
+mainWindow::~mainWindow() {
+  delete ui;
 }
 
 void mainWindow::on_actionOpenMedia_triggered()
@@ -30,13 +30,13 @@ void mainWindow::on_actionOpenMedia_triggered()
       emit sendMediaSource(mMediaSource);
       mediaDialog->show();
     } catch(const std::exception& e) {
-        stdExceptionDialog(this, e) == true ? on_actionAVDumpFormat_triggered() : (void)0 ;
+        stdExceptionDialog(this, e) == true ? on_actionOpenMedia_triggered() : (void)0 ;
     } catch(...) {
-        catchAllExceptionDialog(this) == true ? on_actionAVDumpFormat_triggered() : (void)0 ;
+        catchAllExceptionDialog(this) == true ? on_actionOpenMedia_triggered() : (void)0 ;
     }
 }
 
-void mainWindow::on_actionAVDumpFormat_triggered()
+void mainWindow::on_actionMetadata_triggered()
 {
     try {
 /* throw std::logic_error("got it!"); */   /* throw mediaSourceNotSetException(); */   /* throw 42; */
@@ -51,14 +51,15 @@ void mainWindow::on_actionAVDumpFormat_triggered()
         tab->setObjectName(QString("metadata ")+QString::number(i));
         ui->mainTabWidget->addTab(tab, QString("metadata ")+QString::number(i));
         tab->displayOutput(lBuffer);
+        ui->mainTabWidget->setCurrentWidget(tab);
     } catch(const mediaSourceNotSetException&) {
         mediaSourceNotSetExceptionDialog(this);
     } catch(const mediaSourceWrongException&) {
         mediaSourceWrongExceptionDialog(this);
     } catch(const std::exception& e) {
-        stdExceptionDialog(this, e) == true ? on_actionAVDumpFormat_triggered() : (void)0 ;
+        stdExceptionDialog(this, e) == true ? on_actionMetadata_triggered() : (void)0 ;
     } catch(...) {
-        catchAllExceptionDialog(this) == true ? on_actionAVDumpFormat_triggered() : (void)0 ;
+        catchAllExceptionDialog(this) == true ? on_actionMetadata_triggered() : (void)0 ;
     }
 
 }
@@ -72,19 +73,32 @@ void mainWindow::on_mainTabWidget_tabBarDoubleClicked(int index)
 {
     try {
       bool ok;
-      //int i = QInputDialog::getInt(this, tr("QInputDialog::getInteger()"),
-      //                             tr("Percentage:"), 0, 0, 2, 1, &ok);
       QString text = QInputDialog::getText(this, tr("Change name"),
                                          tr("Change tab name"),
                                          QLineEdit::Normal,
                                          ui->mainTabWidget->tabText(index), &ok);
       ok == true ? ui->mainTabWidget->setTabText(index, text) : (void)false ;
     } catch(...) {
-        catchAllExceptionDialog(this) == true ? on_actionAVDumpFormat_triggered() : (void)0 ;
+    catchAllExceptionNoRetryDialog(this);
     }
 }
 
 void mainWindow::setMediaSource(QString aString)
 {
     mMediaSource = aString;
+}
+
+void mainWindow::on_actionSimplePlayback_triggered() {
+  try {
+    mMediaSource == "" ? throw mediaSourceNotSetException() : (void)0 ;
+    simplePlaybackForm* tab = new simplePlaybackForm(mMediaSource, this);
+    tab->setObjectName(QString("Playback"));
+    ui->mainTabWidget->addTab(tab, QString("Playback"));
+    ui->mainTabWidget->setCurrentWidget(tab);
+  } catch(const mediaSourceNotSetException&) {
+    mediaSourceNotSetExceptionDialog(this);
+  } catch(...) {
+    catchAllExceptionNoRetryDialog(this);
+  }
+
 }

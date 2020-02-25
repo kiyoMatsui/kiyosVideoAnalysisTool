@@ -26,6 +26,7 @@ protected:
 
 signals:
 
+
 public slots:
   void setPlayFlag();
 
@@ -45,6 +46,7 @@ private:
   QOpenGLShaderProgram* mShaderProgram;
   Mk01::engine* pePtr;
   Mk01::Buffer* printBuf;
+  int videoStreamIndex;
 };
 
 #endif // SIMPLEDISPLAY_H

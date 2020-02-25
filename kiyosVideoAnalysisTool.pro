@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui multimedia
+QT       += core gui multimedia printsupport
 CONFIG   += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -23,26 +23,36 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += src/
 INCLUDEPATH += src/qtWidgetsInterface/
 INCLUDEPATH += src/qtWidgets/
 INCLUDEPATH += src/ffmpegUtil/
 INCLUDEPATH += src/playerEngine/
 INCLUDEPATH += thirdParty/
+INCLUDEPATH += thirdParty/mySpsc/
+INCLUDEPATH += thirdParty/qcustomplot/
 
 SOURCES += \
-        src/qtWidgets/main.cpp \
-        src/qtWidgets/mainWindow.cpp \
+    src/qtWidgets/main.cpp \
+    src/qtWidgets/mainWindow.cpp \
     src/qtWidgets/av_dump_format_form.cpp \
     src/qtWidgets/openMediaDialog.cpp \
     src/qtWidgetsInterface/avDumpFormat.cpp \
+    src/qtWidgetsInterface/bitrateForm.cpp \
+    src/qtWidgetsInterface/displayForm.cpp \
+    src/qtWidgetsInterface/selectStreamDialog.cpp \
     src/qtWidgetsInterface/simplePlaybackForm.cpp \
     src/qtWidgetsInterface/simpleDisplay.cpp \
     src/qtWidgetsInterface/simpleAudio.cpp \
     src/qtWidgetsInterface/simpleAudioIO.cpp \
+    src/qtWidgetsInterface/syncedAudioIO.cpp \
+    src/qtWidgetsInterface/syncedDisplay.cpp \
+    thirdParty/qcustomplot/qcustomplot.cpp
 
 HEADERS += \
+    src/appinfo.h \
     src/ffmpegUtil/openglVariables.h \
-        src/qtWidgets/mainWindow.h \
+    src/qtWidgets/mainWindow.h \
     src/qtWidgets/av_dump_format_form.h \
     src/qtWidgets/mainWindowDialogs.h \
     src/qtWidgets/openMediaDialog.h \
@@ -50,15 +60,29 @@ HEADERS += \
     src/ffmpegUtil/customExceptions.h \
     src/ffmpegUtil/ffmpegUPtr.h \
     src/playerEngine/Mk01/engine.h \
+    src/playerEngine/Mk02/engineUtil.h \
+    src/playerEngine/Mk02/engineContainer.h \
+    src/playerEngine/Mk02/playerDemuxer.h \
+    src/playerEngine/Mk02/playerVideoDec.h \
+    src/playerEngine/Mk02/playerAudioDec.h \
+    src/qtWidgetsInterface/bitrateForm.h \
+    src/qtWidgetsInterface/displayForm.h \
+    src/qtWidgetsInterface/selectStreamDialog.h \
     src/qtWidgetsInterface/simplePlaybackForm.h \
     src/qtWidgetsInterface/simpleDisplay.h \
     src/qtWidgetsInterface/simpleAudio.h \
-    src/qtWidgetsInterface/simpleAudioIO.h
+    src/qtWidgetsInterface/simpleAudioIO.h \
+    src/qtWidgetsInterface/syncedAudioIO.h \
+    src/qtWidgetsInterface/syncedDisplay.h \
+    thirdParty/qcustomplot/qcustomplot.h
 
 FORMS += \
         src/qtWidgets/mainWindow.ui \
     src/qtWidgets/av_dump_format_form.ui \
     src/qtWidgets/openMediaDialog.ui \
+    src/qtWidgetsInterface/bitrateForm.ui \
+    src/qtWidgetsInterface/displayForm.ui \
+    src/qtWidgetsInterface/selectStreamDialog.ui \
     src/qtWidgetsInterface/simplePlaybackForm.ui
 
 RESOURCES += \
@@ -121,3 +145,5 @@ unix: PKGCONFIG += libavformat
 unix: PKGCONFIG += libavutil
 
 #unix: PKGCONFIG += libpostproc
+
+DISTFILES +=

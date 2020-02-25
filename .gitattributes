@@ -1,0 +1,6 @@
+ # Prerequisites
+*.cmake linguist-language=cpp
+*.hpp linguist-language=cpp
+*.h linguist-language=cpp
+*.cpp linguist-language=cpp
+

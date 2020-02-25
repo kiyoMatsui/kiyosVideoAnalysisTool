@@ -19,4 +19,5 @@ struct shaderCompileException : virtual public std::exception {
   const char* what() const noexcept {return "shader !OK";}
 };
 
+
 #endif

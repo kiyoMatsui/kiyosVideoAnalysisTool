@@ -1,3 +1,4 @@
+#include "appinfo.h"
 #include "simpleAudioIO.h"
 #include <iostream>
 
@@ -10,7 +11,8 @@ simpleAudioIO::simpleAudioIO(Mk01::engine* ptr, QObject *parent)
 
 
 qint64 simpleAudioIO::readData(char *data, qint64 len) {
-  if (playFlag) {
+  assert((int)len > audioFrameSize || len == 0);
+  if (playFlag && len != 0) {
       int bufferSize = 0;
       int n = 0;
       while(1) {

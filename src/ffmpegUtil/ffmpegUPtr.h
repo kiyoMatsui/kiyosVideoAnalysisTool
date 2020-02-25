@@ -23,7 +23,6 @@ auto AVFormatContextConstructor = [](){  return avformat_alloc_context(); };
 using uPtrAVFormatContext = std::unique_ptr<AVFormatContext, AVFormatContextDestructor> ;
 
 using uPtrAVFormatContext2 = std::unique_ptr<AVFormatContext, std::function<void(AVFormatContext*)> > ;
-// constructor avformat_alloc_context(),
 auto AVFormatContextDeleter2 = [](AVFormatContext* fc){ avformat_close_input(&fc); av_free(fc); };
 
 struct AVCodecContextDestructor {

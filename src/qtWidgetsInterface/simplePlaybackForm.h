@@ -33,7 +33,6 @@ private:
 
   QTime mTime;
   int mFrames;
-  std::thread initThread;
   Mk01::engine playerEngine;
   simpleAudio* mSimpleAudio;
   Ui::simplePlaybackForm *ui;

@@ -37,7 +37,7 @@
       </property>
       <widget class="QWidget" name="introTab">
        <attribute name="title">
-        <string>Welcome!</string>
+        <string>Welcome</string>
        </attribute>
        <widget class="QTextEdit" name="textEdit">
         <property name="geometry">
@@ -57,7 +57,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;Hopefully a useful tool to analyse media files and urls.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;Its just the simplest ffprobe-like tool at the moment...&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt; color:#008000;&quot;&gt;/home/coco/Downloads/vid.mp4&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt; color:#008000;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -126,6 +125,8 @@ p, li { white-space: pre-wrap; }
    <addaction name="actionOpenMedia"/>
    <addaction name="separator"/>
    <addaction name="actionMetadata"/>
+   <addaction name="actionPlayback"/>
+   <addaction name="actionAnalyseBitrate"/>
    <addaction name="actionSimplePlayback"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -157,10 +158,26 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSimplePlayback">
    <property name="text">
-    <string>sPlayback</string>
+    <string>PoorMansPlayback</string>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Simple playback tab&lt;/p&gt;&lt;p&gt;No AV Sync, No CC or seeking&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bad but very simple player&lt;/p&gt;&lt;p&gt;No AV Sync, No CC or seeking&lt;/p&gt;&lt;p&gt;High CPU use&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="actionAnalyseBitrate">
+   <property name="text">
+    <string>Analyse Bitrate</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bitrate per second&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="actionPlayback">
+   <property name="text">
+    <string>Playback</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bad but very simple player&lt;/p&gt;&lt;p&gt;No AV Sync, No CC or seeking&lt;/p&gt;&lt;p&gt;High CPU use&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
  </widget>

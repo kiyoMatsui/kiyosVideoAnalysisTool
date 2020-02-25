@@ -1,5 +1,4 @@
-//
-
+#include "appinfo.h"
 #include "customExceptions.h"
 #include "avDumpFormat.h"
 #include "ffmpegUPtr.h"
@@ -26,8 +25,8 @@ avDumpFormat::avDumpFormat(std::string mediaSourceString, int i)
 }
 
 char* avDumpFormat::getBuffer() const {
+  assert(latestBufferPtr);
   return latestBufferPtr;
 }
-
 }
 

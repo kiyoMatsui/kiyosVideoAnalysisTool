@@ -36,6 +36,10 @@ private slots:
 
   void on_actionSimplePlayback_triggered();
 
+  void on_actionAnalyseBitrate_triggered();
+
+  void on_actionPlayback_triggered();
+
 private:
   QString mMediaSource = "" ;
   Ui::mainWindow *ui;

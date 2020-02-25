@@ -1,6 +1,7 @@
+#include "appinfo.h"
 #include "simplePlaybackForm.h"
 #include "ui_simplePlaybackForm.h"
-
+#include "mainWindowDialogs.h"
 #include <QPainter>
 #include <QString>
 
@@ -13,14 +14,13 @@ simplePlaybackForm::simplePlaybackForm(QString& mMediaSource, QWidget *parent) :
   ui->simpleDisplayWidget->setEngine(&playerEngine);
   connect(this, &simplePlaybackForm::play, ui->simpleDisplayWidget, &simpleDisplay::setPlayFlag);
   connect(this, &simplePlaybackForm::play, mSimpleAudio, &simpleAudio::setPlayFlag);
-  initThread = std::thread{&Mk01::engine::init, &playerEngine };
+  playerEngine.init();
   ui->horizontalSlider->setSliderPosition(50);
 }
 
 simplePlaybackForm::~simplePlaybackForm() {
   delete ui;
   playerEngine.end();
-  initThread.join();
 }
 
 void simplePlaybackForm::paintEvent(QPaintEvent*) {
@@ -30,8 +30,18 @@ void simplePlaybackForm::paintEvent(QPaintEvent*) {
      QString framesPerSecond;
      framesPerSecond.setNum(mFrames /(elapsed / 1000.0), 'f', 2);
      painter.setPen(Qt::black);
-     ui->label->setText(framesPerSecond + " paint calls / s");
+     ui->paintLabel->setText(framesPerSecond + " paint calls / s");
   }
+  if(playerEngine.getExceptionPtr()) {
+      std::exception_ptr temp = playerEngine.getExceptionPtr();
+      try {
+        if(temp) {
+            std::rethrow_exception(temp);
+          }
+      } catch(const std::exception& e) {
+        ui->exceptionLabel->setText("Player engine exception: " + QString(e.what()));
+      }
+    }
   painter.end();
   if (!(mFrames % 100)) {
       mTime.start();
@@ -41,11 +51,12 @@ void simplePlaybackForm::paintEvent(QPaintEvent*) {
   update();
 }
 
+
 void simplePlaybackForm::on_pushButton_clicked() {
   emit play();
 }
 
-void simplePlaybackForm::on_horizontalSlider_valueChanged(int value)
-{
+void simplePlaybackForm::on_horizontalSlider_valueChanged(int value) {
+  assert(value >= 0);
   mSimpleAudio->setVolume(value);
 }

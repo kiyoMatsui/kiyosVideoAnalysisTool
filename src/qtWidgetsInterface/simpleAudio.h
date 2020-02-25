@@ -20,7 +20,9 @@ public:
 
 protected:
 
+
 signals:
+
 
 public slots:
   void setPlayFlag();
@@ -34,6 +36,7 @@ private:
   simpleAudioIO *mIOOutput;
   QAudioOutput *mAudioOutput;
   bool playFlag;
+  int audioStreamIndex;
 
 friend class simpleAudioIO;
 

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>displayForm</class>
+ <widget class="QWidget" name="displayForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>665</width>
+    <height>360</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="widthLabel">
+       <property name="text">
+        <string>width:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="widthSpinBox">
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+       <property name="value">
+        <number>960</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="heightLabel">
+       <property name="text">
+        <string>height:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="heightSpinBox">
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+       <property name="value">
+        <number>540</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="setSizeButton">
+       <property name="text">
+        <string>Set size</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="settingsButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>21</horstretch>
+         <verstretch>21</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="toolTipDuration">
+        <number>1</number>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../qtWidgets/icons/icons.qrc">
+         <normaloff>:/options.png</normaloff>:/options.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="volumeSlider">
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="paintLabel">
+       <property name="text">
+        <string>paint calls/s printed here</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="exceptionLabel">
+       <property name="text">
+        <string> | no exceptions</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>17</width>
+         <height>18</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <item>
+      <widget class="QPushButton" name="playButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../qtWidgets/icons/icons.qrc">
+         <normaloff>:/play.png</normaloff>:/play.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pauseButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../qtWidgets/icons/icons.qrc">
+         <normaloff>:/pause.png</normaloff>:/pause.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>21</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../qtWidgets/icons/icons.qrc">
+         <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="progressSlider">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::NoTicks</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="syncedDisplay" name="syncedDisplayWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>syncedDisplay</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">syncedDisplay.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../qtWidgets/icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

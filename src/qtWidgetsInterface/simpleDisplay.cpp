@@ -1,3 +1,4 @@
+#include "appinfo.h"
 #include "simpleDisplay.h"
 #include "customExceptions.h"
 #include "openglVariables.h"
@@ -16,18 +17,23 @@ simpleDisplay::simpleDisplay(QWidget *parent)
   , mFragmentShader(nullptr)
   , mShaderProgram(nullptr)
   , pePtr(nullptr)
-  , printBuf(nullptr) {
-} //
+  , printBuf(nullptr)
+  , videoStreamIndex{-1} {
+}
 
 simpleDisplay::~simpleDisplay() {
   makeCurrent();
 }
 
 void simpleDisplay::setEngine(Mk01::engine* ptr) {
+  assert(ptr);
   pePtr = ptr;
-  mVideoWidth = ptr->getWidth();
-  mVideoHeight = ptr->getHeight();
-  fpsInterval = 1.0/ptr->getFps();
+  videoStreamIndex = ptr->getVideoIndex();
+  if(videoStreamIndex >= 0) {
+      mVideoWidth = ptr->getWidth();
+      mVideoHeight = ptr->getHeight();
+      fpsInterval = 1.0/ptr->getFps();
+    }
 }
 
 void simpleDisplay::paintGL() {
@@ -46,7 +52,7 @@ void simpleDisplay::paintGL() {
         }
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mVideoWidth, mVideoHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, printBuf->data());
+        if (printBuf) glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mVideoWidth, mVideoHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, printBuf->data());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -87,14 +93,19 @@ void simpleDisplay::initializeGL() {
   glClearColor (0.17, 0.01, 0.89, 0.0);
 }
 
-void simpleDisplay::resizeGL(int, int) {
+void simpleDisplay::resizeGL(int a, int b) {
+  Q_UNUSED(a);
+  Q_UNUSED(b);
 
 }
 
+
 void simpleDisplay::setPlayFlag() {
- playFlag = true;
- lastUpdate = std::chrono::steady_clock::now();
- elapsedTime = fpsInterval;
+  if(videoStreamIndex >= 0) {
+      playFlag = true;
+      lastUpdate = std::chrono::steady_clock::now();
+      elapsedTime = fpsInterval;
+    }
 }
 
 

@@ -35,10 +35,6 @@ private slots:
 
   void on_mainTabWidget_tabBarDoubleClicked(int index);
 
-  void on_actionAnalyseBitrate_triggered();
-
-  void on_actionPlayback_triggered();
-
   void on_actionToggle_tabs_closeable_triggered();
 
   void on_actionWhat_is_this_triggered();

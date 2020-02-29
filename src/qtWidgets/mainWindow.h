@@ -18,6 +18,7 @@ class mainWindow : public QMainWindow
 public:
   explicit mainWindow(QWidget *parent = 0);
   ~mainWindow();
+   void open();
 
 public slots:
   void setMediaSource(QString aString);
@@ -34,7 +35,15 @@ private slots:
 
   void on_mainTabWidget_tabBarDoubleClicked(int index);
 
-  void on_actionSimplePlayback_triggered();
+  void on_actionAnalyseBitrate_triggered();
+
+  void on_actionPlayback_triggered();
+
+  void on_actionToggle_tabs_closeable_triggered();
+
+  void on_actionWhat_is_this_triggered();
+
+  void on_actionSource_code_triggered();
 
   void on_actionAnalyseBitrate_triggered();
 
@@ -42,6 +51,7 @@ private slots:
 
 private:
   QString mMediaSource = "" ;
+  bool closableFlag;
   Ui::mainWindow *ui;
 };
 

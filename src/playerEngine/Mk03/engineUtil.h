@@ -14,10 +14,32 @@
 
 namespace Mk03 {
 
+  struct defaultAnalysis {
+    inline static constexpr bool bitrate = false;
+    inline static constexpr bool loopTime = false;
+  };
+
+  struct bitrateAnalysis {
+    inline static constexpr bool bitrate = true;
+    inline static constexpr bool loopTime = false;
+  };
+
+  struct loopTimeAnalysis {
+    inline static constexpr bool bitrate = false;
+    inline static constexpr bool loopTime = true;
+  };
+
   struct engineJointData {
+    template <typename Tf>
     friend class engineContainer;
+
+    template <typename Tf>
     friend class playerDemuxer;
+
+    template <typename Tf>
     friend class playerAudioDec;
+
+    template <typename Tf>
     friend class playerVideoDec;
 
   private:
@@ -49,6 +71,7 @@ using Buffer = std::vector<std::byte>;
   struct videoBuffer {
     Buffer buffer;
     int64_t ptsXtimeBase_ms;
+    int pktPerFrame;
   };
 
   struct audioBuffer {
@@ -71,13 +94,13 @@ using Buffer = std::vector<std::byte>;
 
   template <typename T>
   void pushToQueue(T ptr, boost::lockfree::spsc_queue<T>& queue) {
-    static_assert (std::is_pointer<T>::value, "Template parameter must be a pointer");
+    static_assert (std::is_pointer<T>::value || std::is_fundamental<T>::value, "Template parameter must be a pointer");
     queue.push(ptr);
   }
 
   template <typename T>
   T popFromQueue(boost::lockfree::spsc_queue<T>& queue) {
-    static_assert (std::is_pointer<T>::value, "Template parameter must be a pointer");
+    static_assert (std::is_pointer<T>::value || std::is_fundamental<T>::value, "Template parameter must be a pointer");
     if (queue.empty()) {
         return nullptr;
     }
@@ -85,6 +108,7 @@ using Buffer = std::vector<std::byte>;
     queue.pop();
     return ptr;
   }
+
 
 } // namespace Mk03
 

@@ -6,9 +6,8 @@
 #include "openMediaDialog.h"
 #include "av_dump_format_form.h"
 #include "avDumpFormat.h"
-#include "simplePlaybackForm.h"
 #include "bitrateForm.h"
-#include "displayForm.h"
+#include "playbackForm.h"
 
 #include <QInputDialog>
 #include <QLineEdit>
@@ -17,6 +16,7 @@
 
 mainWindow::mainWindow(QWidget *parent) :
   QMainWindow(parent),
+  closableFlag(false),
   ui(new Ui::mainWindow) {
   ui->setupUi(this);
 }
@@ -92,14 +92,30 @@ void mainWindow::setMediaSource(QString aString)
     mMediaSource = aString;
 }
 
+void mainWindow::on_actionAnalyseBitrate_triggered()
+{
+  try {
+/* throw std::logic_error("got it!"); */   /* throw mediaSourceNotSetException(); */   /* throw 42; */
+      mMediaSource == "" ? throw mediaSourceNotSetException() : (void)0 ;
+      bitrateForm* tab = new bitrateForm(mMediaSource, ui->mainTabWidget);
+      tab->setObjectName(QString("bitrate "));
+      ui->mainTabWidget->addTab(tab, QString("bitrate "));
+      ui->mainTabWidget->setCurrentWidget(tab);
+  } catch(const mediaSourceNotSetException&) {
+      mediaSourceNotSetExceptionDialog(this);
+  } catch(const mediaSourceWrongException&) {
+      mediaSourceWrongExceptionDialog(this);
+  } catch(const std::exception& e) {
+      stdExceptionDialog(this, e) == true ? on_actionAnalyseBitrate_triggered() : (void)0 ;
+  } catch(...) {
+      catchAllExceptionDialog(this) == true ? on_actionAnalyseBitrate_triggered() : (void)0 ;
+  }
+}
 
-
-
-
-void mainWindow::on_actionSimplePlayback_triggered() {
+void mainWindow::on_actionPlayback_triggered() {
   try {
     mMediaSource == "" ? throw mediaSourceNotSetException() : (void)0 ;
-    simplePlaybackForm* tab = new simplePlaybackForm(mMediaSource, ui->mainTabWidget);
+    playbackForm* tab = new playbackForm(mMediaSource, ui->mainTabWidget);
     tab->setObjectName(QString("Playback"));
     ui->mainTabWidget->addTab(tab, QString("Playback"));
     ui->mainTabWidget->setCurrentWidget(tab);
@@ -109,12 +125,29 @@ void mainWindow::on_actionSimplePlayback_triggered() {
     if (QString(e.what()) == QString("invalidUrl")) {
         mediaSourceWrongExceptionDialog(this);
       } else {
-        stdExceptionDialog(this, e) == true ? on_actionSimplePlayback_triggered() : (void)0 ;
+        stdExceptionDialog(this, e) == true ? on_actionPlayback_triggered() : (void)0 ;
       }
   } catch(...) {
     catchAllExceptionNoRetryDialog(this);
   }
+}
 
+void mainWindow::on_actionToggle_tabs_closeable_triggered() {
+  if(closableFlag) {
+      ui->mainTabWidget->setTabsClosable(closableFlag);
+      closableFlag = false;
+    } else {
+      ui->mainTabWidget->setTabsClosable(closableFlag);
+      closableFlag = true;
+    }
+}
+
+void mainWindow::on_actionWhat_is_this_triggered() {
+  QWhatsThis::enterWhatsThisMode();
+}
+
+void mainWindow::on_actionSource_code_triggered() {
+  QDesktopServices::openUrl(QUrl("https://github.com/kiyoMatsui/kiyosVideoAnalysisTool"));
 }
 
 void mainWindow::on_actionAnalyseBitrate_triggered()

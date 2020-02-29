@@ -17,6 +17,7 @@
 
 namespace Mk03 {
 
+template <typename T = Mk03::defaultAnalysis>
 class engineContainer {
 
 public:
@@ -67,20 +68,20 @@ public:
         av_seek_frame(fc.get(), jointData.videoStreamIndex, seek_pts, AVSEEK_FLAG_ANY);
         flushFlag = true;
       }
-    mPlayerDemuxerPtr.reset(new playerDemuxer(jointData, fc));
+    mPlayerDemuxerPtr.reset(new playerDemuxer<T>(jointData, fc));
     if(jointData.audioStreamIndex >= 0) {
-        mPlayerAudioDecPtr.reset(new playerAudioDec(jointData, fc, sFmt, flushFlag));
+        mPlayerAudioDecPtr.reset(new playerAudioDec<T>(jointData, fc, sFmt, flushFlag));
       }
-    mPlayerVideoDecPtr.reset(new playerVideoDec(jointData, fc, pFmt, flushFlag));
+    mPlayerVideoDecPtr.reset(new playerVideoDec<T>(jointData, fc, pFmt, flushFlag));
 
     threads.reserve(3);
   }
 
   void startThreads() {
-    threads.emplace_back(&Mk03::playerDemuxer::demux, mPlayerDemuxerPtr.get());
-    threads.emplace_back(&Mk03::playerVideoDec::decodeVideo, mPlayerVideoDecPtr.get());
+    threads.emplace_back(&Mk03::playerDemuxer<T>::demux, mPlayerDemuxerPtr.get());
+    threads.emplace_back(&Mk03::playerVideoDec<T>::decodeVideo, mPlayerVideoDecPtr.get());
     if(mPlayerAudioDecPtr)
-      threads.emplace_back(&Mk03::playerAudioDec::decodeAudio, mPlayerAudioDecPtr.get());
+      threads.emplace_back(&Mk03::playerAudioDec<T>::decodeAudio, mPlayerAudioDecPtr.get());
   }
 
 private:
@@ -151,8 +152,15 @@ public:
   int getVideoStreamIndex() const { return jointData.videoStreamIndex; }
   int getDuration() const { return fc->duration; }
   double getFps() const {
-    return static_cast<double>( (fc->streams[jointData.videoStreamIndex]->avg_frame_rate).num/
-        (fc->streams[jointData.videoStreamIndex]->avg_frame_rate).den );
+    return static_cast<double>( (fc->streams[jointData.videoStreamIndex]->r_frame_rate).num/
+        (fc->streams[jointData.videoStreamIndex]->r_frame_rate).den );
+  }
+  int getVideoBitrate() const {
+    if(fc->bit_rate < 1000) {
+        return 10000;
+      } else {
+        return fc->bit_rate;
+      }
   }
   int getWidth() const { return mPlayerVideoDecPtr->videoCodecContext->width; }
   int getHeight() const { return mPlayerVideoDecPtr->videoCodecContext->height; }
@@ -207,13 +215,15 @@ private:
   AVPixelFormat pFmt;
   AVSampleFormat sFmt;
   uPtrAVFormatContext fc;
-  std::unique_ptr<playerDemuxer> mPlayerDemuxerPtr;
-  std::unique_ptr<playerAudioDec> mPlayerAudioDecPtr;
-  std::unique_ptr<playerVideoDec> mPlayerVideoDecPtr;
+  std::unique_ptr<playerDemuxer<T>> mPlayerDemuxerPtr;
+  std::unique_ptr<playerAudioDec<T>> mPlayerAudioDecPtr;
+  std::unique_ptr<playerVideoDec<T>> mPlayerVideoDecPtr;
   std::vector<std::thread> threads;
   std::exception_ptr exceptionPtr;
   mutable std::mutex exceptionPtrMutex;
   std::atomic<bool> exceptionFlag;
+
+  inline static constexpr T analysis{};
 };
 
 } // namespace Mk03

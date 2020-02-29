@@ -1,8 +1,8 @@
-#ifndef DISPLAYFORM_H
-#define DISPLAYFORM_H
+#ifndef PLAYBACKFORM_H
+#define PLAYBACKFORM_H
 
 
-#include "Mk02/engineContainer.h"
+#include "Mk03/engineContainer.h"
 #include "syncedAudioIO.h"
 #include <QWidget>
 #include <QAudioOutput>
@@ -14,16 +14,16 @@
 #include <thread>
 
 namespace Ui {
-  class displayForm;
+  class playbackForm;
 }
 enum class playerState {playing, paused, stopped };
-class displayForm : public QWidget
+class playbackForm : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit displayForm(QString& mMediaSource, QWidget *parent = nullptr);
-  ~displayForm();
+  explicit playbackForm(QString& mMediaSource, QWidget *parent = nullptr);
+  ~playbackForm();
 
 signals:
   void play(bool flag);
@@ -58,12 +58,12 @@ private:
   playerState mPlayerState;
   bool sliderHeldDown;
   bool sizeFlag;
-  std::unique_ptr<Mk02::engineContainer> playerEngine;
+  std::unique_ptr<Mk03::engineContainer<>> playerEngine;
   QAudioFormat mFormat;
   QAudioDeviceInfo mDevice;
   syncedAudioIO *mIOOutput;
   QAudioOutput *mAudioOutput;
-  Ui::displayForm *ui;
+  Ui::playbackForm *ui;
 };
 
-#endif // DISPLAYFORM_H
+#endif // PLAYBACKFORM_H

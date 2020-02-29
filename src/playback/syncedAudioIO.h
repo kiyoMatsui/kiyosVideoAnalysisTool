@@ -7,7 +7,7 @@
 #include <QIODevice>
 #include <thread>
 #include "ffmpegUPtr.h"
-#include "Mk02/engineContainer.h"
+#include "Mk03/engineContainer.h"
 
 
 class syncedAudioIO : public QIODevice
@@ -15,7 +15,7 @@ class syncedAudioIO : public QIODevice
   Q_OBJECT
 
 public:
-  explicit syncedAudioIO(Mk02::engineContainer* ptr, QObject *parent = nullptr);
+  explicit syncedAudioIO(Mk03::engineContainer<>* ptr, QObject *parent = nullptr);
 
 protected:
   qint64 readData(char *data, qint64 maxlen) override;
@@ -28,9 +28,9 @@ signals:
 public slots:
 
 private:
-  Mk02::engineContainer* pePtr;
+  Mk03::engineContainer<>* pePtr;
   int channelXSampleBytes;
-  Mk02::audioBuffer* playBuf;
+  Mk03::audioBuffer* playBuf;
 
 friend class displayForm;
 };

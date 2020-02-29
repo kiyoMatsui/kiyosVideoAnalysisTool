@@ -15,8 +15,10 @@
 
 namespace Mk03 {
 
+template <typename T>
 class playerAudioDec {
 
+template <typename Tf>
 friend class engineContainer;
 
 public:
@@ -132,6 +134,8 @@ private:
   std::exception_ptr exceptionPtr;
   mutable std::mutex exceptionPtrMutex;
   std::atomic<bool> exceptionFlag;
+
+  inline static constexpr T analysis{};
 };
 
 } // namespace Mk03

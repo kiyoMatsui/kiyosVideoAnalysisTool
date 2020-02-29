@@ -8,7 +8,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
 #include <QOpenGLShaderProgram>
-#include "Mk02/engineContainer.h"
+#include "Mk03/engineContainer.h"
 
 
 class syncedDisplay : public QOpenGLWidget, public QOpenGLFunctions
@@ -17,7 +17,7 @@ class syncedDisplay : public QOpenGLWidget, public QOpenGLFunctions
 
 public:
   explicit syncedDisplay(QWidget *parent = nullptr);
-  void setEngine(Mk02::engineContainer* ptr);
+  void setEngine(Mk03::engineContainer<>* ptr);
   ~syncedDisplay() override;
   void slotAudioPtsXBase_ms(int64_t ptsXBase);
 
@@ -28,6 +28,7 @@ protected:
 
 signals:
   void emitProgressPtsXBase(int64_t pts);
+
 
 public slots:
   void setPlayFlag(bool flag);
@@ -46,8 +47,8 @@ private:
   std::unique_ptr<QOpenGLShader> mVertexShader;
   std::unique_ptr<QOpenGLShader> mFragmentShader;
   QOpenGLShaderProgram* mShaderProgram;
-  Mk02::engineContainer* pePtr;
-  Mk02::videoBuffer* printBuf;
+  Mk03::engineContainer<>* pePtr;
+  Mk03::videoBuffer* printBuf;
   int64_t audioPtsXBase_ms;
 };
 

@@ -14,9 +14,8 @@ openMediaDialog::~openMediaDialog()
   delete ui;
 }
 
-void openMediaDialog::on_buttonBox_accepted()
-{
-  emit returnMediaSource(ui->lineEdit->text());
+void openMediaDialog::on_buttonBox_accepted() {
+  emit returnMediaSource(ui->lineEdit->text().trimmed());
 }
 
 void openMediaDialog::setMediaSource(QString aString)

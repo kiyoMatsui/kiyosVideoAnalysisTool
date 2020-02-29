@@ -3,7 +3,7 @@
 #include <QDebug>
 
 
-syncedAudioIO::syncedAudioIO(Mk02::engineContainer* ptr, QObject *parent)
+syncedAudioIO::syncedAudioIO(Mk03::engineContainer<>* ptr, QObject *parent)
   : QIODevice(parent)
   , pePtr(ptr)
   , channelXSampleBytes(ptr->getChannelCount()*ptr->getSampleBytes())

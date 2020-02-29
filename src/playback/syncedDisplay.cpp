@@ -27,7 +27,7 @@ syncedDisplay::~syncedDisplay() {
   makeCurrent();
 }
 
-void syncedDisplay::setEngine(Mk02::engineContainer* ptr) {
+void syncedDisplay::setEngine(Mk03::engineContainer<>* ptr) {
   assert(ptr);
   pePtr = ptr;
   mVideoWidth = ptr->getWidth();
@@ -45,7 +45,7 @@ void syncedDisplay::paintGL() {
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, textureId);
       if (elapsedTime+updateTick > fpsInterval) {
-          Mk02::videoBuffer* buf = pePtr->getVideoBuffer();
+          Mk03::videoBuffer* buf = pePtr->getVideoBuffer();
           if(buf) {
               if (printBuf) pePtr->returnVideoBuffer(printBuf);
               printBuf = buf;

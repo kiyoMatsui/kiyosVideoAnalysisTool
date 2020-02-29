@@ -1,10 +1,10 @@
-#include "displayForm.h"
-#include "ui_displayForm.h"
+#include "playbackForm.h"
+#include "ui_playbackForm.h"
 #include "customExceptions.h"
 #include "selectStreamDialog.h"
 #include <QPainter>
 
-displayForm::displayForm(QString& aMediaSource, QWidget *parent)
+playbackForm::playbackForm(QString& aMediaSource, QWidget *parent)
   : QWidget(parent)
   , mMediaSource(aMediaSource.toStdString())
   , mTime()
@@ -12,12 +12,12 @@ displayForm::displayForm(QString& aMediaSource, QWidget *parent)
   , mPlayerState(playerState::stopped)
   , sliderHeldDown(false)
   , sizeFlag(false)
-  , playerEngine(new Mk02::engineContainer(mMediaSource, AV_PIX_FMT_RGB24, AV_SAMPLE_FMT_FLT))
+  , playerEngine(new Mk03::engineContainer<>(mMediaSource, AV_PIX_FMT_RGB24, AV_SAMPLE_FMT_FLT))
   , mFormat()
   , mDevice{QAudioDeviceInfo::defaultOutputDevice()}
   , mIOOutput(nullptr)
   , mAudioOutput(nullptr)
-  , ui(new Ui::displayForm) {
+  , ui(new Ui::playbackForm) {
   ui->setupUi(this);
   ui->syncedDisplayWidget->setEngine(playerEngine.get());
   playerEngine->startThreads();
@@ -28,15 +28,15 @@ displayForm::displayForm(QString& aMediaSource, QWidget *parent)
       mAudioOutput->setVolume(0.5);
       ui->volumeSlider->setSliderPosition(50);
     }
-  connect(this, &displayForm::play, ui->syncedDisplayWidget, &syncedDisplay::setPlayFlag);
-  connect(ui->syncedDisplayWidget, &syncedDisplay::emitProgressPtsXBase, this, &displayForm::setProgress);
+  connect(this, &playbackForm::play, ui->syncedDisplayWidget, &syncedDisplay::setPlayFlag);
+  connect(ui->syncedDisplayWidget, &syncedDisplay::emitProgressPtsXBase, this, &playbackForm::setProgress);
 }
 
-displayForm::~displayForm() {
+playbackForm::~playbackForm() {
   delete ui;
 }
 
-void displayForm::initAudio() {
+void playbackForm::initAudio() {
   assert(playerEngine);
   mFormat.setSampleRate(playerEngine->getSampleRate());
   mFormat.setChannelCount(playerEngine->getChannelCount());
@@ -52,10 +52,10 @@ void displayForm::initAudio() {
   mIOOutput = new syncedAudioIO(playerEngine.get(), this);
   mAudioOutput = new QAudioOutput(mDevice, mFormat, this);
   connect(mIOOutput, &syncedAudioIO::emitPtsXBase, ui->syncedDisplayWidget, &syncedDisplay::slotAudioPtsXBase_ms);
-  connect(mAudioOutput, &QAudioOutput::stateChanged, this, &displayForm::audioStateChange);
+  connect(mAudioOutput, &QAudioOutput::stateChanged, this, &playbackForm::audioStateChange);
 }
 
-void displayForm::paintEvent(QPaintEvent*) {
+void playbackForm::paintEvent(QPaintEvent*) {
   QPainter painter;
   painter.begin(this);
   if (const int elapsed = mTime.elapsed()) {
@@ -83,18 +83,18 @@ void displayForm::paintEvent(QPaintEvent*) {
   update();
 }
 
-void displayForm::audioStateChange(QAudio::State state) {
+void playbackForm::audioStateChange(QAudio::State state) {
   qWarning() << "QAudioOutput state changed (id): " << state;
   if(state == QAudio::StoppedState) ui->progressSlider->setSliderPosition(0);
 }
 
-void displayForm::setProgress(int64_t pts) {
+void playbackForm::setProgress(int64_t pts) {
   if(!sliderHeldDown) {
       ui->progressSlider->setSliderPosition(pts*1000);
     }
 }
 
-void displayForm::on_playButton_clicked() {
+void playbackForm::on_playButton_clicked() {
   switch(mPlayerState) {
     case playerState::playing:
       break;
@@ -112,7 +112,7 @@ void displayForm::on_playButton_clicked() {
   }
 }
 
-void displayForm::on_pauseButton_clicked() {
+void playbackForm::on_pauseButton_clicked() {
   switch(mPlayerState) {
     case playerState::playing:
       emit play(false);
@@ -126,11 +126,11 @@ void displayForm::on_pauseButton_clicked() {
   }
 }
 
-void displayForm::on_stopButton_clicked() {
+void playbackForm::on_stopButton_clicked() {
   setStreams(playerEngine->getAudioStreamIndex(), playerEngine->getVideoStreamIndex());
 }
 
-void displayForm::on_setSizeButton_clicked() {
+void playbackForm::on_setSizeButton_clicked() {
   if(sizeFlag) {
       ui->setSizeButton->setText("Set Size");
       ui->syncedDisplayWidget->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
@@ -143,10 +143,10 @@ void displayForm::on_setSizeButton_clicked() {
     }
 }
 
-void displayForm::on_settingsButton_clicked() {
+void playbackForm::on_settingsButton_clicked() {
   try {
     selectStreamDialog* mDialog = new selectStreamDialog(playerEngine.get(),this);
-    connect(mDialog, &selectStreamDialog::emitStreamArguments, this, &displayForm::setStreams);
+    connect(mDialog, &selectStreamDialog::emitStreamArguments, this, &playbackForm::setStreams);
     mDialog->show();
   } catch(...) {
     QMessageBox::critical(this, ("Opening settings failed"),
@@ -155,25 +155,25 @@ void displayForm::on_settingsButton_clicked() {
   }
 }
 
-void displayForm::on_volumeSlider_valueChanged(int value) {
+void playbackForm::on_volumeSlider_valueChanged(int value) {
   if(playerEngine->getAudioStreamIndex() >= 0) {
     assert(value >= 0);
     mAudioOutput->setVolume((double)value/100);
     }
 }
 
-void displayForm::on_progressSlider_sliderPressed() {
+void playbackForm::on_progressSlider_sliderPressed() {
   sliderHeldDown = true;
   on_pauseButton_clicked();
 }
 
-void displayForm::on_progressSlider_sliderReleased() {
+void playbackForm::on_progressSlider_sliderReleased() {
   sliderHeldDown = false;
   setStreams(playerEngine->getAudioStreamIndex(),playerEngine->getVideoStreamIndex(),ui->progressSlider->value()/1000);
   on_playButton_clicked();
 }
 
-void displayForm::setStreams(int audioID, int videoID, int64_t seek_ms) {
+void playbackForm::setStreams(int audioID, int videoID, int64_t seek_ms) {
   on_pauseButton_clicked();
   // ugly but required for simple seeking
   if(seek_ms <= 0) ui->progressSlider->setSliderPosition(0);
@@ -192,7 +192,7 @@ void displayForm::setStreams(int audioID, int videoID, int64_t seek_ms) {
         disconnect(mAudioOutput, nullptr, nullptr, nullptr);
         mAudioOutput->stop();
       }
-    playerEngine.reset(new Mk02::engineContainer(mMediaSource, AV_PIX_FMT_RGB24, AV_SAMPLE_FMT_FLT,audioID,videoID,pendingSeek));
+    playerEngine.reset(new Mk03::engineContainer<>(mMediaSource, AV_PIX_FMT_RGB24, AV_SAMPLE_FMT_FLT,audioID,videoID,pendingSeek));
     ui->syncedDisplayWidget->setEngine(playerEngine.get());
     playerEngine->startThreads();
     if(oldAudioID >= 0) {
@@ -204,8 +204,8 @@ void displayForm::setStreams(int audioID, int videoID, int64_t seek_ms) {
         mAudioOutput->setVolume((double)(ui->volumeSlider->value())/100.0);
       }
     mPlayerState = playerState::stopped;
-    connect(this, &displayForm::play, ui->syncedDisplayWidget, &syncedDisplay::setPlayFlag);
-    connect(ui->syncedDisplayWidget, &syncedDisplay::emitProgressPtsXBase, this, &displayForm::setProgress);
+    connect(this, &playbackForm::play, ui->syncedDisplayWidget, &syncedDisplay::setPlayFlag);
+    connect(ui->syncedDisplayWidget, &syncedDisplay::emitProgressPtsXBase, this, &playbackForm::setProgress);
   } catch (...) {
     QMessageBox::critical(this, ("Exception thrown"),
                           ("<p>Media player could not be reset, " \

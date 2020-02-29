@@ -5,7 +5,7 @@
 #include <QDialog>
 #include <QString>
 #include <QMessageBox>
-#include "Mk02/engineContainer.h"
+#include "Mk03/engineContainer.h"
 
 namespace Ui {
   class selectStreamDialog;
@@ -16,7 +16,7 @@ class selectStreamDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit selectStreamDialog(Mk02::engineContainer* aPePtr, QWidget *parent = nullptr);
+  explicit selectStreamDialog(Mk03::engineContainer<> *aPePtr, QWidget *parent = nullptr);
   ~selectStreamDialog();
 
 signals:
@@ -26,7 +26,7 @@ private slots:
   void on_buttonBox_accepted();
 
 private:
-  Mk02::engineContainer* pePtr;
+  Mk03::engineContainer<> *pePtr;
   Ui::selectStreamDialog *ui;
 };
 

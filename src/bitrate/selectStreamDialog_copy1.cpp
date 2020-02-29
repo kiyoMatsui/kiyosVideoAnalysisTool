@@ -1,12 +1,11 @@
-#include "selectStreamDialog.h"
-#include "ui_selectStreamDialog.h"
+#include "selectStreamDialog_copy1.h"
+#include "ui_selectStreamDialog_copy1.h"
 
 
-selectStreamDialog::selectStreamDialog(Mk02::engineContainer* aPePtr, QWidget *parent) :
+selectStreamDialog_copy1::selectStreamDialog_copy1(Mk03::engineContainer<Mk03::bitrateAnalysis>* aPePtr, QWidget *parent) :
   QDialog(parent),
   pePtr(aPePtr),
-  ui(new Ui::selectStreamDialog)
-{
+  ui(new Ui::selectStreamDialog_copy1) {
   ui->setupUi(this);
   ui->audioSpinBox->setRange(-1,pePtr->getStreams()-1);
   ui->videoSpinBox->setRange(0,pePtr->getStreams()-1);
@@ -14,12 +13,12 @@ selectStreamDialog::selectStreamDialog(Mk02::engineContainer* aPePtr, QWidget *p
   ui->videoSpinBox->setValue(pePtr->getVideoStreamIndex());
 }
 
-selectStreamDialog::~selectStreamDialog()
+selectStreamDialog_copy1::~selectStreamDialog_copy1()
 {
   delete ui;
 }
 
-void selectStreamDialog::on_buttonBox_accepted()
+void selectStreamDialog_copy1::on_buttonBox_accepted()
 {
   if ((pePtr->checkStreamType(ui->audioSpinBox->value()) == 1 || //AVMEDIA_TYPE_AUDIO = 1
       pePtr->checkStreamType(ui->audioSpinBox->value()) == -1 ) && // no audio  = -1

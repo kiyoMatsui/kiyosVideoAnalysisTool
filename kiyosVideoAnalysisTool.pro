@@ -24,7 +24,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH += src/
-INCLUDEPATH += src/qtWidgetsInterface/
+INCLUDEPATH += src/bitrate/
+INCLUDEPATH += src/metadata/
+INCLUDEPATH += src/playback/
 INCLUDEPATH += src/qtWidgets/
 INCLUDEPATH += src/ffmpegUtil/
 INCLUDEPATH += src/playerEngine/
@@ -37,16 +39,13 @@ SOURCES += \
     src/qtWidgets/mainWindow.cpp \
     src/qtWidgets/av_dump_format_form.cpp \
     src/qtWidgets/openMediaDialog.cpp \
-    src/qtWidgetsInterface/avDumpFormat.cpp \
-    src/qtWidgetsInterface/bitrateForm.cpp \
-    src/qtWidgetsInterface/displayForm.cpp \
-    src/qtWidgetsInterface/selectStreamDialog.cpp \
-    src/qtWidgetsInterface/simplePlaybackForm.cpp \
-    src/qtWidgetsInterface/simpleDisplay.cpp \
-    src/qtWidgetsInterface/simpleAudio.cpp \
-    src/qtWidgetsInterface/simpleAudioIO.cpp \
-    src/qtWidgetsInterface/syncedAudioIO.cpp \
-    src/qtWidgetsInterface/syncedDisplay.cpp \
+    src/metadata/avDumpFormat.cpp \
+    src/bitrate/bitrateForm.cpp \
+    src/playback/playbackForm.cpp \
+    src/playback/selectStreamDialog.cpp \
+    src/bitrate/selectStreamDialog_copy1.cpp \
+    src/playback/syncedAudioIO.cpp \
+    src/playback/syncedDisplay.cpp \
     thirdParty/qcustomplot/qcustomplot.cpp
 
 HEADERS += \
@@ -56,34 +55,31 @@ HEADERS += \
     src/qtWidgets/av_dump_format_form.h \
     src/qtWidgets/mainWindowDialogs.h \
     src/qtWidgets/openMediaDialog.h \
-    src/qtWidgetsInterface/avDumpFormat.h \
+    src/metadata/avDumpFormat.h \
     src/ffmpegUtil/customExceptions.h \
     src/ffmpegUtil/ffmpegUPtr.h \
     src/playerEngine/Mk01/engine.h \
-    src/playerEngine/Mk02/engineUtil.h \
-    src/playerEngine/Mk02/engineContainer.h \
-    src/playerEngine/Mk02/playerDemuxer.h \
-    src/playerEngine/Mk02/playerVideoDec.h \
-    src/playerEngine/Mk02/playerAudioDec.h \
-    src/qtWidgetsInterface/bitrateForm.h \
-    src/qtWidgetsInterface/displayForm.h \
-    src/qtWidgetsInterface/selectStreamDialog.h \
-    src/qtWidgetsInterface/simplePlaybackForm.h \
-    src/qtWidgetsInterface/simpleDisplay.h \
-    src/qtWidgetsInterface/simpleAudio.h \
-    src/qtWidgetsInterface/simpleAudioIO.h \
-    src/qtWidgetsInterface/syncedAudioIO.h \
-    src/qtWidgetsInterface/syncedDisplay.h \
+    src/playerEngine/Mk03/engineUtil.h \
+    src/playerEngine/Mk03/engineContainer.h \
+    src/playerEngine/Mk03/playerDemuxer.h \
+    src/playerEngine/Mk03/playerVideoDec.h \
+    src/playerEngine/Mk03/playerAudioDec.h \
+    src/bitrate/bitrateForm.h \
+    src/playback/playbackForm.h \
+    src/playback/selectStreamDialog.h \
+    src/bitrate/selectStreamDialog_copy1.h \
+    src/playback/syncedAudioIO.h \
+    src/playback/syncedDisplay.h \
     thirdParty/qcustomplot/qcustomplot.h
 
 FORMS += \
         src/qtWidgets/mainWindow.ui \
     src/qtWidgets/av_dump_format_form.ui \
     src/qtWidgets/openMediaDialog.ui \
-    src/qtWidgetsInterface/bitrateForm.ui \
-    src/qtWidgetsInterface/displayForm.ui \
-    src/qtWidgetsInterface/selectStreamDialog.ui \
-    src/qtWidgetsInterface/simplePlaybackForm.ui
+    src/bitrate/bitrateForm.ui \
+    src/playback/playbackForm.ui \
+    src/playback/selectStreamDialog.ui \
+    src/bitrate/selectStreamDialog_copy1.ui 
 
 RESOURCES += \
     src/qtWidgets/icons/icons.qrc

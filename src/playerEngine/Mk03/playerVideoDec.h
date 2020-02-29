@@ -15,8 +15,10 @@
 
 namespace Mk03 {
 
+template <typename T>
 class playerVideoDec {
 
+template <typename Tf>
 friend class engineContainer;
 
 public:
@@ -30,7 +32,8 @@ public:
     , videoQueueSend{jointData.videoBufferQueue}
     , videoQueueReturn{jointData.videoBufferQueue}
     , exceptionPtr(nullptr)
-    , exceptionFlag(false) {
+    , exceptionFlag(false)
+    , pktSizeSum(0) {
     assert(pktQueue > audioBufferQueue + videoBufferQueue);
     const auto videoCodec = avcodec_find_decoder(afc->streams[jointData.videoStreamIndex]->codecpar->codec_id);
     videoCodecContext.reset(AVCodecContextConstructor(videoCodec));
@@ -44,7 +47,7 @@ public:
     for (unsigned int n = 0; n < jointData.videoBufferQueue ; ++n)
       videoBuffers.push_back({std::vector<std::byte>(
                                static_cast<unsigned int>(
-                                 videoCodecContext->height*videoCodecContext->width*pixelBytes)),0});
+                                 videoCodecContext->height*videoCodecContext->width*pixelBytes)),0,0});
 
     for( auto& buffer : videoBuffers)
       pushToQueue(&buffer, videoQueueReturn);
@@ -63,18 +66,27 @@ private:
         if (!pkt) threadWait(jointData.packetVideoQueueSendMutex, jointData.packetVideoQueueSendCV, jointData.packetVideoQueueSend, jointData.endFlag);
         if(jointData.endFlag.load()) break;
         if(pkt != nullptr && finalFrame != nullptr) {
+            if constexpr (analysis.bitrate) pktSizeSum += pkt->size ;
             avcodec_send_packet(videoCodecContext.get(), pkt);
             pushToQueue<AVPacket*>(pkt,jointData.packetQueueReturn);
             pkt = nullptr;
             threadNotify(jointData.packetQueueReturnMutex, jointData.packetQueueReturnCV);
             while (1) {
                 int ret = avcodec_receive_frame(videoCodecContext.get(), videoFrame.get());
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
+                if (ret == AVERROR(EAGAIN)) {
+                    break;
+                  } else if (ret == AVERROR_EOF) {
+                    throw std::runtime_error("AVERROR_EOF");
+                  }
                 uint8_t* buf = reinterpret_cast<uint8_t*>(finalFrame->buffer.data());
                 sws_scale(scaleContext.get(), videoFrame->data, videoFrame->linesize, 0,
                           videoCodecContext->height, &buf,
                           pFmtLineSize);
                 finalFrame->ptsXtimeBase_ms = (videoFrame->pts*timeBase.num*1000)/timeBase.den;
+                if constexpr (analysis.bitrate) {
+                  finalFrame->pktPerFrame = pktSizeSum;
+                  pktSizeSum = 0;
+                }
                 pushToQueue(finalFrame, videoQueueSend);
                 finalFrame = nullptr;
           }
@@ -125,6 +137,9 @@ private:
   std::exception_ptr exceptionPtr;
   mutable std::mutex exceptionPtrMutex;
   std::atomic<bool> exceptionFlag;
+  int pktSizeSum;
+
+  inline static constexpr T analysis{};
 };
 
 } // namespace Mk03

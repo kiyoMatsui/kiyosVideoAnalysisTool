@@ -7,7 +7,7 @@ namespace Ui {
 class openMediaDialog;
 }
 
-class openMediaDialog : public QDialog
+class openMediaDialog final : public QDialog
 {
   Q_OBJECT
 

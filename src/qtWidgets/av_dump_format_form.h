@@ -8,7 +8,7 @@ namespace Ui {
 class av_dump_format_form;
 }
 
-class av_dump_format_form : public QWidget
+class av_dump_format_form final : public QWidget
 {
   Q_OBJECT
 

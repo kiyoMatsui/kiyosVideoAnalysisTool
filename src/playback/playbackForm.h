@@ -17,12 +17,13 @@ namespace Ui {
   class playbackForm;
 }
 enum class playerState {playing, paused, stopped };
-class playbackForm : public QWidget
+class playbackForm final : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit playbackForm(QString& mMediaSource, QWidget *parent = nullptr);
+  playbackForm(QString& mMediaSource, QWidget *parent = nullptr);
+  playbackForm(std::shared_ptr<Mk03::engineContainer<>> aPlayerEngine, QString& mMediaSource, QWidget *parent = nullptr);
   ~playbackForm();
 
 signals:
@@ -58,7 +59,7 @@ private:
   playerState mPlayerState;
   bool sliderHeldDown;
   bool sizeFlag;
-  std::unique_ptr<Mk03::engineContainer<>> playerEngine;
+  std::shared_ptr<Mk03::engineContainer<>> playerEngine;
   QAudioFormat mFormat;
   QAudioDeviceInfo mDevice;
   syncedAudioIO *mIOOutput;

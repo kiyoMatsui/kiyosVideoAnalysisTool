@@ -9,7 +9,7 @@
 #include <string>
 
 
-namespace qtWidgetsInterface {
+namespace metadata {
 
 class avDumpFormat {
 
@@ -26,6 +26,8 @@ class avDumpFormat {
 
  protected:
 
+ public:
+  const int index;
  private:
   const unsigned int bufferSize = 65536;
   std::vector<char> stdErrorBuffer;

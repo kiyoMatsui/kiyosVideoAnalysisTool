@@ -25,7 +25,7 @@ void selectStreamDialog_copy1::on_buttonBox_accepted()
       pePtr->checkStreamType(ui->videoSpinBox->value()) == 0 ) { // AVMEDIA_TYPE_VIDEO = 0
       emit emitStreamArguments(ui->audioSpinBox->value(),ui->videoSpinBox->value());
     } else {
-      QMessageBox::critical(this, ("stream index error"),
+      QMessageBox::warning(this, ("stream index error"),
                            ("<p>Stream index wrong type! "
                             "<p>Hit Metadata to check which stream (index) is a video/audio type. " \
                             "<p>Streams set to default."),

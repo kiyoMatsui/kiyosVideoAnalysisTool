@@ -25,7 +25,8 @@ class bitrateForm : public QWidget
   Q_OBJECT
 
 public:
-  explicit bitrateForm(QString& mMediaSource, QWidget *parent = nullptr);
+  bitrateForm(QString& mMediaSource, QWidget *parent = nullptr);
+  bitrateForm(std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> aPlayerEngine, QString& mMediaSource, QWidget *parent = nullptr);
   ~bitrateForm();
 
 signals:
@@ -58,7 +59,7 @@ private:
   bool sliderHeldDown;
   bool sizeFlag;
   QTimer dataTimer;
-  std::unique_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> playerEngine;
+  std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> playerEngine;
   double fpsInterval;
   double sumOfFpsInterval;
   int sumOfpktSizes;

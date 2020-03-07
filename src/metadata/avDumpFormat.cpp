@@ -3,10 +3,11 @@
 #include "avDumpFormat.h"
 #include "ffmpegUPtr.h"
 
-namespace qtWidgetsInterface {
+namespace metadata {
 
 avDumpFormat::avDumpFormat(std::string mediaSourceString, int i)
-  : fc(AVFormatContextConstructor())
+  : index(i)
+  , fc(AVFormatContextConstructor())
   , latestBufferPtr(nullptr) {
   AVFormatContext* temp = fc.get();
   if(avformat_open_input(&temp, mediaSourceString.c_str(), nullptr, nullptr) < 0) {

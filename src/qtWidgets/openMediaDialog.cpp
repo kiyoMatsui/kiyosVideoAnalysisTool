@@ -1,6 +1,6 @@
 #include "openMediaDialog.h"
 #include "ui_openMediaDialog.h"
-
+#include "mainWindow.h"
 #include <QFileDialog>
 
 openMediaDialog::openMediaDialog(QWidget *parent) :
@@ -16,6 +16,7 @@ openMediaDialog::~openMediaDialog()
 
 void openMediaDialog::on_buttonBox_accepted() {
   emit returnMediaSource(ui->lineEdit->text().trimmed());
+  disconnect(this, nullptr, nullptr, nullptr);
 }
 
 void openMediaDialog::setMediaSource(QString aString)

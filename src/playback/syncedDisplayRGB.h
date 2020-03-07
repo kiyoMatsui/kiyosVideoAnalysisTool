@@ -1,5 +1,5 @@
-#ifndef SYNCEDDISPLAY_H
-#define SYNCEDDISPLAY_H
+#ifndef SYNCEDDISPLAYRGB_H
+#define SYNCEDDISPLAYRGB_H
 
 #include <chrono>
 #include <memory>
@@ -11,14 +11,14 @@
 #include "Mk03/engineContainer.h"
 
 
-class syncedDisplay final : public QOpenGLWidget, public QOpenGLFunctions
+class syncedDisplayRGB final : public QOpenGLWidget, public QOpenGLFunctions
 {
   Q_OBJECT
 
 public:
-  explicit syncedDisplay(QWidget *parent = nullptr);
+  explicit syncedDisplayRGB(QWidget *parent = nullptr);
   void setEngine(Mk03::engineContainer<>* ptr);
-  ~syncedDisplay() override;
+  ~syncedDisplayRGB() override;
   void slotAudioPtsXBase_ms(int64_t ptsXBase);
 
 protected:
@@ -52,4 +52,4 @@ private:
   int64_t audioPtsXBase_ms;
 };
 
-#endif // SYNCEDDISPLAY_H
+#endif // SYNCEDDISPLAYRGB_H

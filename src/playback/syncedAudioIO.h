@@ -10,7 +10,7 @@
 #include "Mk03/engineContainer.h"
 
 
-class syncedAudioIO : public QIODevice
+class syncedAudioIO final : public QIODevice
 {
   Q_OBJECT
 

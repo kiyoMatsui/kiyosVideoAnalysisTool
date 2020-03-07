@@ -32,6 +32,34 @@ playbackForm::playbackForm(QString& aMediaSource, QWidget *parent)
   connect(ui->syncedDisplayWidget, &syncedDisplay::emitProgressPtsXBase, this, &playbackForm::setProgress);
 }
 
+playbackForm::playbackForm(std::shared_ptr<Mk03::engineContainer<>> aPlayerEngine, QString& aMediaSource, QWidget *parent)
+  : QWidget(parent)
+  , mMediaSource(aMediaSource.toStdString())
+  , mTime()
+  , mFrames(0)
+  , mPlayerState(playerState::stopped)
+  , sliderHeldDown(false)
+  , sizeFlag(false)
+  , playerEngine(aPlayerEngine)
+  , mFormat()
+  , mDevice{QAudioDeviceInfo::defaultOutputDevice()}
+  , mIOOutput(nullptr)
+  , mAudioOutput(nullptr)
+  , ui(new Ui::playbackForm) {
+  ui->setupUi(this);
+  ui->syncedDisplayWidget->setEngine(playerEngine.get());
+  playerEngine->startThreads();
+  ui->progressSlider->setRange(0, playerEngine->getDuration());
+  ui->progressSlider->setSliderPosition(0);
+  if(playerEngine->getAudioStreamIndex() >= 0) {
+      initAudio();
+      mAudioOutput->setVolume(0.5);
+      ui->volumeSlider->setSliderPosition(50);
+    }
+  connect(this, &playbackForm::play, ui->syncedDisplayWidget, &syncedDisplay::setPlayFlag);
+  connect(ui->syncedDisplayWidget, &syncedDisplay::emitProgressPtsXBase, this, &playbackForm::setProgress);
+}
+
 playbackForm::~playbackForm() {
   delete ui;
 }

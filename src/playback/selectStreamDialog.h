@@ -11,7 +11,7 @@ namespace Ui {
   class selectStreamDialog;
 }
 
-class selectStreamDialog : public QDialog
+class selectStreamDialog final : public QDialog
 {
   Q_OBJECT
 

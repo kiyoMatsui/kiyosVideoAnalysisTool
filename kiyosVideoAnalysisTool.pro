@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui multimedia printsupport
+QT       += core gui multimedia printsupport concurrent
 CONFIG   += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

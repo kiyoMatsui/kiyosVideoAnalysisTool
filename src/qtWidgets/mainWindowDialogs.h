@@ -46,18 +46,16 @@ inline bool stdExceptionDialog(mainWindow* thisPtr, const std::exception& e) {
 }
 
 inline void mediaSourceNotSetExceptionDialog(mainWindow* thisPtr) {
-  QMessageBox::critical(thisPtr, thisPtr->tr("Media source not set"),
+  QMessageBox::information(thisPtr, thisPtr->tr("Media source not set"),
                         thisPtr->tr("<p>Media source is not set. " \
                                     "<p>Click on Open Media to set a url or file path."),
                         QMessageBox::Abort );
 }
 
 inline void mediaSourceWrongExceptionDialog(mainWindow* thisPtr) {
-  QMessageBox::critical(thisPtr, thisPtr->tr("Media source not found"),
-                        thisPtr->tr("<p>Exception thrown! Media source not found, " \
-                                    "so please reset it by clicking on Open Media and input the url or file path." \
-                                    "<p>The action is stopped, hopefully this action is exception safe " \
-                                    "and you can try again after setting the media source."),
+  QMessageBox::warning(thisPtr, thisPtr->tr("Media source not found"),
+                        thisPtr->tr("<p>Media source not found, " \
+                                    "Please check the url or file path by clicking on Open Media."),
                         QMessageBox::Abort );
 }
 

@@ -23,7 +23,8 @@ SET(CMAKE_MODULE_PATH "${MAINFOLDER}/cmake")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/ffmpegUtil")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/qtWidgets")
-INCLUDE_DIRECTORIES("${MAINFOLDER}/src/qtWidgetsInterface")
+INCLUDE_DIRECTORIES("${MAINFOLDER}/src/metadata")
+INCLUDE_DIRECTORIES("${MAINFOLDER}/src/playback")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/bitrate")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/playerEngine")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty")
@@ -35,7 +36,7 @@ INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty/catch") #catch.hpp
 ## example project Sources
 FILE(GLOB_RECURSE EXAMPLE_SRCS01 ${MAINFOLDER}/src/*.cpp ${MAINFOLDER}/src/qtWidgets/*.ui ${MAINFOLDER}/src/qtWidgets/*.qrc ${MAINFOLDER}/thirdParty/qcustomplot/qcustomplot.cpp)
 
-find_package(Qt5 COMPONENTS Widgets PrintSupport Network Multimedia REQUIRED)
+find_package(Qt5 COMPONENTS Widgets PrintSupport Network Multimedia Concurrent REQUIRED)
 
 if(Qt5Widgets_FOUND)
     message("-- Found Qt5")
@@ -119,7 +120,7 @@ ENDIF()
 
 
 ## Creating Binaries for examples
-SET(PROJECT_LIBS ${CMAKE_DL_LIBS} Qt5::Widgets Qt5::Network Qt5::Multimedia Qt5::PrintSupport ${FFMPEG_LIBRARIES_TMP}) 
+SET(PROJECT_LIBS ${CMAKE_DL_LIBS} Qt5::Widgets Qt5::Network Qt5::Multimedia Qt5::PrintSupport Qt5::Concurrent ${FFMPEG_LIBRARIES_TMP}) 
 
 SET(EXAMPLE1_NAME ${APPLICATION_NAME})
 SET(EXAMPLE1_BIN ${EXAMPLE1_NAME})

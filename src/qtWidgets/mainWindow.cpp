@@ -19,9 +19,11 @@
 mainWindow::mainWindow(QWidget *parent) :
   QMainWindow(parent),
   closableTabFlag(false),
-  on_actionMetadata_triggeredAM(),
-  on_actionAnalyseBitrate_triggeredAM(),
-  on_actionPlayback_triggeredAM(),
+  loadingCount(0),
+  loadingDoneFlag(false),
+  on_actionMetadata_triggeredAM(loadingCount),
+  on_actionAnalyseBitrate_triggeredAM(loadingCount),
+  on_actionPlayback_triggeredAM(loadingCount),
   ui(new Ui::mainWindow) {
   ui->setupUi(this);
   connect(&on_actionMetadata_triggeredAM.watcher, &QFutureWatcher<std::shared_ptr<metadata::avDumpFormat>>::finished,
@@ -34,6 +36,26 @@ mainWindow::mainWindow(QWidget *parent) :
 
 mainWindow::~mainWindow() {
   delete ui;
+}
+
+void mainWindow::paintEvent(QPaintEvent*) {
+  if(loadingCount > 0) {
+      loadingDoneFlag = true;
+      if (ui->statusBar->currentMessage() == QString("   -")) {
+          ui->statusBar->showMessage("   \\");
+        } else if (ui->statusBar->currentMessage() == QString("   \\")) {
+          ui->statusBar->showMessage("   |");
+        } else if (ui->statusBar->currentMessage() == QString("   |")) {
+          ui->statusBar->showMessage("   /");
+        } else {
+          ui->statusBar->showMessage("   -");
+        }
+    } else {
+      if(loadingDoneFlag) {
+          ui->statusBar->showMessage("Done", 10000);
+          loadingDoneFlag = false;
+        }
+    }
 }
 
 void mainWindow::on_actionOpenMedia_triggered() {
@@ -68,7 +90,7 @@ void mainWindow::on_actionMetadata_triggered() {
               on_actionMetadata_triggeredAM.exceptionPtr = std::current_exception();
               return nullptr;
             }
-        });
+        }); loadingCount++;
         on_actionMetadata_triggeredAM.watcher.setFuture(future);
       } catch(const mediaSourceNotSetException&) {
         mediaSourceNotSetExceptionDialog(this);
@@ -161,7 +183,7 @@ void mainWindow::on_actionAnalyseBitrate_triggered() {
               on_actionAnalyseBitrate_triggeredAM.exceptionPtr = std::current_exception();
               return nullptr;
             }
-        });
+        }); loadingCount++;
         on_actionAnalyseBitrate_triggeredAM.watcher.setFuture(future);
       } catch(const mediaSourceNotSetException&) {
         mediaSourceNotSetExceptionDialog(this);
@@ -216,7 +238,7 @@ void mainWindow::on_actionPlayback_triggered() {
               on_actionPlayback_triggeredAM.exceptionPtr = std::current_exception();
               return nullptr;
             }
-        });
+        }); loadingCount++;
         on_actionPlayback_triggeredAM.watcher.setFuture(future);
       } catch(const mediaSourceNotSetException&) {
         mediaSourceNotSetExceptionDialog(this);

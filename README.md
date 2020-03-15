@@ -20,15 +20,13 @@ Build info:
 Kiyo's video analysis tool has been built on Windows and GNU/Linux.
 
 Windows:
-
 To build on windows, other than qt5 almost all the dependencies come included with the source code.
 Boost and qcustomplot are included in the thirdParty folder, you shouldn't have to do anything here...
-In the thirdParty directory there is a zip folder of the ffmpeg windows dlls. This can be copied and pasted into your qt5 installation. 
+In the windows directory there is a zip folder of the ffmpeg windows dlls. This can be copied and pasted into your qt5 installation. 
 For example, copy the dlls here (defualt qt installation path: C:\Qt\5.12.6\mingw73_64\bin) then open the pro file in qtcreator.
 Thats it!
 
 GNU/Linux:
-
 Like windows you only really have to build and install ffmpeg as the other dependencies come with the source code (use the package manager to install qt5).
 Once ffmpeg is built and installed the pkg_config should do the rest. ffmpeg version 4.2.1 or greater was tested so that version is probably required.
 Building with CMake is also supported, CMake version greater than 3.1 is required.

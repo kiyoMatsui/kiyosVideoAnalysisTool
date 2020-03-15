@@ -7,6 +7,7 @@
 #include <QString>
 #include <QMessageBox>
 #include <QFutureWatcher>
+#include <QTimer>
 
 #include "Mk03/engineContainer.h"
 
@@ -18,16 +19,19 @@ enum class sourceType{ local=0, DASH, HLS}; // use static_cast<int> to get index
 template <typename T>
 class asyncMembers {
 public:
-  explicit asyncMembers()
-    : exceptionPtr(nullptr)
+  explicit asyncMembers(unsigned int& aCounter)
+    : counter(aCounter)
+    , exceptionPtr(nullptr)
     , watcher()
     , clickedFlag(false) {
   }
   void reset() {
+    counter--;
     clickedFlag.exchange(false);
     exceptionPtr = nullptr;
   }
 
+  unsigned int& counter;
   std::exception_ptr exceptionPtr;
   QFutureWatcher<T> watcher;
   std::atomic<bool> clickedFlag;
@@ -44,6 +48,9 @@ class mainWindow : public QMainWindow
 public:
   explicit mainWindow(QWidget *parent = 0);
   ~mainWindow();
+
+private:
+  void paintEvent(QPaintEvent *event) override;
 
 public slots:
   void setMediaSource(QString aString);
@@ -81,6 +88,8 @@ private slots:
 private:
   QString mMediaSource = "" ;
   bool closableTabFlag;
+  unsigned int loadingCount;
+  bool loadingDoneFlag;
   asyncMembers<std::shared_ptr<metadata::avDumpFormat>> on_actionMetadata_triggeredAM;
   asyncMembers<std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>>> on_actionAnalyseBitrate_triggeredAM;
   asyncMembers<std::shared_ptr<Mk03::engineContainer<>>> on_actionPlayback_triggeredAM;

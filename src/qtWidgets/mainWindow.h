@@ -1,20 +1,37 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <memory>
-#include <exception>
-#include <QMainWindow>
-#include <QString>
-#include <QMessageBox>
 #include <QFutureWatcher>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QString>
 #include <QTimer>
+#include <exception>
+#include <memory>
 
 #include "Mk03/engineContainer.h"
 
 namespace metadata {
-  class avDumpFormat;
+class avDumpFormat;
 }
-enum class sourceType{ local=0, DASH, HLS}; // use static_cast<int> to get index
+enum class sourceType { local = 0, DASH, HLS };  // use static_cast<int> to get index
+
+template <typename T>
+class asyncMembers {
+ public:
+  explicit asyncMembers(unsigned int &aCounter)
+      : counter(aCounter), exceptionPtr(nullptr), watcher(), clickedFlag(false) {}
+  void reset() {
+    counter--;
+    clickedFlag.exchange(false);
+    exceptionPtr = nullptr;
+  }
+
+  unsigned int &counter;
+  std::exception_ptr exceptionPtr;
+  QFutureWatcher<T> watcher;
+  std::atomic<bool> clickedFlag;
+};
 
 template <typename T>
 class asyncMembers {
@@ -41,25 +58,23 @@ namespace Ui {
 class mainWindow;
 }
 
-class mainWindow : public QMainWindow
-{
+class mainWindow : public QMainWindow {
   Q_OBJECT
 
-public:
+ public:
   explicit mainWindow(QWidget *parent = 0);
   ~mainWindow();
 
-private:
+ private:
   void paintEvent(QPaintEvent *event) override;
 
-public slots:
+ public slots:
   void setMediaSource(QString aString);
 
-
-signals:
+ signals:
   void sendMediaSource(QString aMediaSource);
 
-private slots:
+ private slots:
   void on_actionOpenMedia_triggered();
 
   void on_actionMetadata_triggered();
@@ -78,15 +93,14 @@ private slots:
 
   void on_actionPlayback_triggered();
 
-
-  void metadataCallback(); //if slot follows the signature style (slot name!) it will moan with user defined slots.
+  void metadataCallback();  // if slot follows the signature style (slot name!) it will moan with user defined slots.
 
   void analyseBitrateCallback();
 
   void PlaybackCallback();
 
-private:
-  QString mMediaSource = "" ;
+ private:
+  QString mMediaSource = "";
   bool closableTabFlag;
   unsigned int loadingCount;
   bool loadingDoneFlag;
@@ -96,5 +110,4 @@ private:
   Ui::mainWindow *ui;
 };
 
-
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

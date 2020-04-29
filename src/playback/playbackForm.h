@@ -1,35 +1,36 @@
 #ifndef PLAYBACKFORM_H
 #define PLAYBACKFORM_H
 
-
-#include "Mk03/engineContainer.h"
-#include "syncedAudioIO.h"
-#include <QWidget>
 #include <QAudioOutput>
 #include <QByteArray>
 #include <QComboBox>
 #include <QIODevice>
-#include <QTime>
 #include <QString>
+#include <QTime>
+#include <QWidget>
 #include <thread>
+#include "Mk03/engineContainer.h"
+#include "syncedAudioIO.h"
 
 namespace Ui {
-  class playbackForm;
+class playbackForm;
 }
-enum class playerState {playing, paused, stopped };
-class playbackForm final : public QWidget
-{
+enum class playerState { playing, paused, stopped };
+class playbackForm final : public QWidget {
   Q_OBJECT
 
-public:
-  playbackForm(QString& mMediaSource, QWidget *parent = nullptr);
-  playbackForm(std::shared_ptr<Mk03::engineContainer<>> aPlayerEngine, QString& mMediaSource, QWidget *parent = nullptr);
+  friend class playbacktest;
+
+ public:
+  playbackForm(QString &aMediaSource, QWidget *parent = nullptr);
+  playbackForm(std::shared_ptr<Mk03::engineContainer<>> aPlayerEngine, QString &aMediaSource,
+               QWidget *parent = nullptr);
   ~playbackForm();
 
-signals:
+ signals:
   void play(bool flag);
 
-private slots:
+ private slots:
   void on_playButton_clicked();
 
   void on_pauseButton_clicked();
@@ -46,11 +47,11 @@ private slots:
 
   void on_progressSlider_sliderReleased();
 
-private:
+ private:
   void paintEvent(QPaintEvent *event) override;
   void audioStateChange(QAudio::State state);
   void setProgress(int64_t pts);
-  void setStreams(int a, int v, int64_t seek_pts = -1);
+  void setStreams(int audioID, int videoID, int64_t seek_ms = -1);
   void initAudio();
 
   std::string mMediaSource;
@@ -67,4 +68,4 @@ private:
   Ui::playbackForm *ui;
 };
 
-#endif // PLAYBACKFORM_H
+#endif  // PLAYBACKFORM_H

@@ -4,20 +4,16 @@
 #include <exception>
 #include <type_traits>
 
-
-
 struct mediaSourceNotSetException : virtual public std::exception {
-  const char* what() const noexcept {return "mediaSrc !Set";}
+  const char* what() const noexcept { return "mediaSrc !Set"; }
 };
 
-
 struct mediaSourceWrongException : virtual public std::exception {
-  const char* what() const noexcept {return "mediaSrc !OK";}
+  const char* what() const noexcept { return "mediaSrc !OK"; }
 };
 
 struct shaderCompileException : virtual public std::exception {
-  const char* what() const noexcept {return "shader !OK";}
+  const char* what() const noexcept { return "shader !OK"; }
 };
-
 
 #endif

@@ -1,12 +1,8 @@
 #include "av_dump_format_form.h"
-#include "ui_av_dump_format_form.h"
 #include "avDumpFormat.h"
+#include "ui_av_dump_format_form.h"
 
-
-
-av_dump_format_form::av_dump_format_form(QWidget *parent) :
-  QWidget(parent),
-  ui(new Ui::av_dump_format_form) {
+av_dump_format_form::av_dump_format_form(QWidget* parent) : QWidget(parent), ui(new Ui::av_dump_format_form) {
   ui->setupUi(this);
 }
 

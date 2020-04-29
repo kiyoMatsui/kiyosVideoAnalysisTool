@@ -3,23 +3,20 @@
 
 #include <QWidget>
 
-
 namespace Ui {
 class av_dump_format_form;
 }
 
-class av_dump_format_form final : public QWidget
-{
+class av_dump_format_form final : public QWidget {
   Q_OBJECT
 
-
-public:
+ public:
   explicit av_dump_format_form(QWidget *parent = 0);
   ~av_dump_format_form();
-  void displayOutput(char* str);
+  void displayOutput(char *str);
 
-private:
+ private:
   Ui::av_dump_format_form *ui;
 };
 
-#endif // AV_DUMP_FORMAT_FORM_H
+#endif  // AV_DUMP_FORMAT_FORM_H

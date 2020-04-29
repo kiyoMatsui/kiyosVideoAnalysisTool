@@ -6,6 +6,7 @@
 
 QT       += core gui multimedia printsupport concurrent
 CONFIG   += c++17
+QMAKE_CXXFLAGS_RELEASE += -O3
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -34,8 +35,7 @@ INCLUDEPATH += thirdParty/
 INCLUDEPATH += thirdParty/mySpsc/
 INCLUDEPATH += thirdParty/qcustomplot/
 
-SOURCES += \
-    src/qtWidgets/main.cpp \
+SOURCES += src/qtWidgets/main.cpp \
     src/qtWidgets/mainWindow.cpp \
     src/qtWidgets/av_dump_format_form.cpp \
     src/qtWidgets/openMediaDialog.cpp \
@@ -58,7 +58,6 @@ HEADERS += \
     src/metadata/avDumpFormat.h \
     src/ffmpegUtil/customExceptions.h \
     src/ffmpegUtil/ffmpegUPtr.h \
-    src/playerEngine/Mk01/engine.h \
     src/playerEngine/Mk03/engineUtil.h \
     src/playerEngine/Mk03/engineContainer.h \
     src/playerEngine/Mk03/playerDemuxer.h \

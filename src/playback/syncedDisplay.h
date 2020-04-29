@@ -1,39 +1,36 @@
 #ifndef SYNCEDDISPLAY_H
 #define SYNCEDDISPLAY_H
 
+#include <QOpenGLFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+#include <QOpenGLWidget>
+#include <QWidget>
 #include <chrono>
 #include <memory>
-#include <QWidget>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-#include <QOpenGLTexture>
-#include <QOpenGLShaderProgram>
 #include "Mk03/engineContainer.h"
 
-
-class syncedDisplay final : public QOpenGLWidget, public QOpenGLFunctions
-{
+class syncedDisplay final : public QOpenGLWidget, public QOpenGLFunctions {
   Q_OBJECT
 
-public:
-  explicit syncedDisplay(QWidget *parent = nullptr);
+ public:
+  explicit syncedDisplay(QWidget* parent = nullptr);
   void setEngine(Mk03::engineContainer<>* ptr);
   ~syncedDisplay() override;
   void slotAudioPtsXBase_ms(int64_t ptsXBase);
 
-protected:
-  void resizeGL(int w, int h) override;
+ protected:
+  void resizeGL(int a, int b) override;
   void paintGL() override;
   void initializeGL() override;
 
-signals:
+ signals:
   void emitProgressPtsXBase(int64_t pts);
 
-
-public slots:
+ public slots:
   void setPlayFlag(bool flag);
 
-private:
+ private:
   int rgbTexture;
   GLuint textureId;
   GLsizei mVideoWidth;
@@ -52,4 +49,4 @@ private:
   int64_t audioPtsXBase_ms;
 };
 
-#endif // SYNCEDDISPLAY_H
+#endif  // SYNCEDDISPLAY_H

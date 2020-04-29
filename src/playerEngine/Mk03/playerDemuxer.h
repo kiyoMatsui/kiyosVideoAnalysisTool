@@ -1,115 +1,109 @@
 #ifndef MK03_PLAYERDEMUXER_H
 #define MK03_PLAYERDEMUXER_H
 
-
-#include "appinfo.h"
-#include "Mk03/engineUtil.h"
-#include "ffmpegUPtr.h"
-#include "mySpsc/boost/lockfree/spsc_queue.hpp"
+#include <atomic>
+#include <condition_variable>
 #include <cstddef>
 #include <deque>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <atomic>
-#include <condition_variable>
+#include "Mk03/engineUtil.h"
+#include "appinfo.h"
+#include "ffmpegUPtr.h"
+#include "mySpsc/boost/lockfree/spsc_queue.hpp"
 
 namespace Mk03 {
 
 template <typename T>
 class playerDemuxer {
+  template <typename Tf>
+  friend class engineContainer;
 
-template <typename Tf>
-friend class engineContainer;
-
-public:
+ public:
   playerDemuxer(engineJointData& ejd, uPtrAVFormatContext& afc)
-    : jointData(ejd)
-    , fc(afc)
-    , exceptionPtr(nullptr)
-    , exceptionFlag(false)
-    , playFlag(false) {
+      : jointData(ejd), fc(afc), exceptionPtr(nullptr), exceptionFlag(false), playFlag(false) {
     assert(pktQueue > audioBufferQueue + videoBufferQueue);
     jointData.packetQueueReturn.reset();
     for (unsigned int n = 0; n < jointData.pktQueue; ++n) {
-        packetBuffers.emplace_back(AVPacketConstructor());
-      }
+      packetBuffers.emplace_back(AVPacketConstructor());
+    }
     AVPacket* pkt = nullptr;
     for (auto& pktUPtr : packetBuffers) {
-        pkt = pktUPtr.get();
-        int ret = av_read_frame(fc.get(), pkt);
-        pushPktToCorrectQueue(ret, pkt);
-        pkt = nullptr;
-      }
+      pkt = pktUPtr.get();
+      int ret = av_read_frame(fc.get(), pkt);
+      pushPktToCorrectQueue(ret, pkt);
+      pkt = nullptr;
+    }
   }
 
-private:
+ private:
   void demux() {
     try {
       AVPacket* pkt = nullptr;
       int ret = -1;
       for (;;) {
-          { // pause
-            std::unique_lock<std::mutex> lck(jointData.playMutex);
-            jointData.playCV.wait(lck, [=]{ return playFlag.load() || jointData.endFlag.load(); });
-          }
-          if(jointData.endFlag.load()) break;
-          if(!pkt) pkt = popFromQueue<AVPacket*>(jointData.packetQueueReturn);
-          if(pkt) {
-              ret = av_read_frame(fc.get(), pkt);
-              if(!pushPktToCorrectQueue(ret, pkt)) break;
-              pkt = nullptr;
-            } else {
-              threadWait(jointData.packetQueueReturnMutex, jointData.packetQueueReturnCV, jointData.packetQueueReturn, jointData.endFlag);
-            }
-          if(jointData.endFlag.load()) break;
+        {  // pause
+          std::unique_lock<std::mutex> lck(jointData.playMutex);
+          jointData.playCV.wait(lck, [=] { return playFlag.load() || jointData.endFlag.load(); });
         }
+        if (jointData.endFlag.load()) break;
+        if (!pkt) pkt = popFromQueue<AVPacket*>(jointData.packetQueueReturn);
+        if (pkt) {
+          ret = av_read_frame(fc.get(), pkt);
+          if (!pushPktToCorrectQueue(ret, pkt)) break;
+          pkt = nullptr;
+        } else {
+          threadWait(jointData.packetQueueReturnMutex, jointData.packetQueueReturnCV, jointData.packetQueueReturn,
+                     jointData.endFlag);
+        }
+        if (jointData.endFlag.load()) break;
+      }
     } catch (...) {
       const std::lock_guard<std::mutex> lock(exceptionPtrMutex);
-      if(!exceptionFlag.load()) {
+      if (!exceptionFlag.load()) {
         exceptionFlag.exchange(true);
-        if(!exceptionPtr) exceptionPtr = std::current_exception();
-        }
+        if (!exceptionPtr) exceptionPtr = std::current_exception();
+      }
       end();
     }
   }
   bool pushPktToCorrectQueue(int& ret, AVPacket* pkt) {
     if (ret >= 0) {
-        if (pkt->stream_index == jointData.videoStreamIndex) {
-            pushToQueue<AVPacket*>(pkt, jointData.packetVideoQueueSend);
-            threadNotify(jointData.packetVideoQueueSendMutex, jointData.packetVideoQueueSendCV);
-          } else if (pkt->stream_index == jointData.audioStreamIndex) {
-            pushToQueue<AVPacket*>(pkt, jointData.packetAudioQueueSend);
-            threadNotify(jointData.packetAudioQueueSendMutex, jointData.packetAudioQueueSendCV);
-          } else {
-            pushToQueue<AVPacket*>(pkt, jointData.packetQueueReturn);
-          }
+      if (pkt->stream_index == jointData.videoStreamIndex) {
+        pushToQueue<AVPacket*>(pkt, jointData.packetVideoQueueSend);
+        threadNotify(jointData.packetVideoQueueSendMutex, jointData.packetVideoQueueSendCV);
+      } else if (pkt->stream_index == jointData.audioStreamIndex) {
+        pushToQueue<AVPacket*>(pkt, jointData.packetAudioQueueSend);
+        threadNotify(jointData.packetAudioQueueSendMutex, jointData.packetAudioQueueSendCV);
       } else {
         pushToQueue<AVPacket*>(pkt, jointData.packetQueueReturn);
-        return false;
       }
+    } else {
+      pushToQueue<AVPacket*>(pkt, jointData.packetQueueReturn);
+      return false;
+    }
     return true;
   }
-  void end() {
-    jointData.endFlag.exchange(true);
-  }
+  void end() { jointData.endFlag.exchange(true); }
 
-
-public:
+ public:
   std::exception_ptr getExceptionPtr() const {
-    if(!exceptionFlag.load()) return nullptr;
+    if (!exceptionFlag.load()) return nullptr;
     const std::lock_guard<std::mutex> lock(exceptionPtrMutex);
-    if(exceptionPtr) return exceptionPtr;
-    else return nullptr;
+    if (exceptionPtr)
+      return exceptionPtr;
+    else
+      return nullptr;
   }
 
-  playerDemuxer(const playerDemuxer &other) = delete;
-  playerDemuxer &operator=(const playerDemuxer &other) = delete;
-  playerDemuxer(playerDemuxer &&other) noexcept = delete;
-  playerDemuxer &operator=(playerDemuxer &&other) noexcept = delete;
+  playerDemuxer(const playerDemuxer& other) = delete;
+  playerDemuxer& operator=(const playerDemuxer& other) = delete;
+  playerDemuxer(playerDemuxer&& other) noexcept = delete;
+  playerDemuxer& operator=(playerDemuxer&& other) noexcept = delete;
   ~playerDemuxer() noexcept {}
 
-private:
+ private:
   engineJointData& jointData;
   uPtrAVFormatContext& fc;
   std::vector<uPtrAVPacket> packetBuffers;
@@ -121,6 +115,6 @@ private:
   inline static constexpr T analysis{};
 };
 
-} // namespace Mk03
+}  // namespace Mk03
 
 #endif

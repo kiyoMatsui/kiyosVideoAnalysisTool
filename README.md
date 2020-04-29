@@ -1,7 +1,7 @@
 # kiyosVideoAnalysisTool
 Welcome to Kiyo's video analysis tool!
 
-Hopefully a useful tool to analyse media files and urls. Should work with Dash/HLS and local mp4/ogv/webm files.
+Hopefully a useful tool to analyse media files and urls. Should work with local mp4/ogv/webm files and Dash/HLS (using ffmpeg libraries built-in demuxers).
 
 Currently, Kiyo's video analysis tool can print metadata, test playback and analyse the video bitrate.
 
@@ -9,11 +9,7 @@ It can be quite powerful when run from qtcreator's debugger; set breakpoints or 
 
 GPL v3 licence
 
-Test streams:
-
-http://rdmedia.bbc.co.uk/dash/ondemand/bbb/2/client_manifest-high_profile-level_40-common_init.mpd
-
-https://dash.akamaized.net/dash264/TestCases/2a/qualcomm/1/MultiResMPEG2.mpd
+Test mp4 files in ./test
 
 Build info:
 

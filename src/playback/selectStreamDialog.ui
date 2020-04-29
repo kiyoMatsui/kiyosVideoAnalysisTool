@@ -19,6 +19,9 @@
      <property name="text">
       <string>Audio Stream Index</string>
      </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="0" column="1">
@@ -45,6 +48,9 @@
     <widget class="QLineEdit" name="videoLineEdit">
      <property name="text">
       <string>Video Stream Index</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

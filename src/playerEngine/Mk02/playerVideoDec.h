@@ -1,36 +1,34 @@
 #ifndef MK02_PLAYERVIDEODEC_H
 #define MK02_PLAYERVIDEODEC_H
 
-
-#include "appinfo.h"
-#include "Mk02/engineUtil.h"
-#include "ffmpegUPtr.h"
-#include "mySpsc/boost/lockfree/spsc_queue.hpp"
+#include <atomic>
 #include <cstddef>
 #include <deque>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <atomic>
+#include "Mk02/engineUtil.h"
+#include "appinfo.h"
+#include "ffmpegUPtr.h"
+#include "mySpsc/boost/lockfree/spsc_queue.hpp"
 
 namespace Mk02 {
 
 class playerVideoDec {
+  friend class engineContainer;
 
-friend class engineContainer;
-
-public:
-  playerVideoDec(engineJointData& ejd, uPtrAVFormatContext& afc, AVPixelFormat pFmt, bool flushFlag)
-    : jointData(ejd)
-    , timeBase(afc->streams[jointData.videoStreamIndex]->time_base)
-    , pixelBytes(av_get_bits_per_pixel(av_pix_fmt_desc_get(pFmt))/jointData.bitsPerByte)
-    , videoCodecContext(nullptr)
-    , scaleContext(nullptr)
-    , videoFrame(nullptr)
-    , videoQueueSend{jointData.videoBufferQueue}
-    , videoQueueReturn{jointData.videoBufferQueue}
-    , exceptionPtr(nullptr)
-    , exceptionFlag(false) {
+ public:
+  playerVideoDec(engineJointData &ejd, uPtrAVFormatContext &afc, AVPixelFormat pFmt, bool flushFlag)
+      : jointData(ejd),
+        timeBase(afc->streams[jointData.videoStreamIndex]->time_base),
+        pixelBytes(av_get_bits_per_pixel(av_pix_fmt_desc_get(pFmt)) / jointData.bitsPerByte),
+        videoCodecContext(nullptr),
+        scaleContext(nullptr),
+        videoFrame(nullptr),
+        videoQueueSend{jointData.videoBufferQueue},
+        videoQueueReturn{jointData.videoBufferQueue},
+        exceptionPtr(nullptr),
+        exceptionFlag(false) {
     assert(pktQueue > audioBufferQueue + videoBufferQueue);
     const auto videoCodec = avcodec_find_decoder(afc->streams[jointData.videoStreamIndex]->codecpar->codec_id);
     videoCodecContext.reset(AVCodecContextConstructor(videoCodec));
@@ -39,78 +37,77 @@ public:
     scaleContext.reset(SwsContextConstructor(nullptr, videoCodecContext.get(), pFmt));
     av_image_fill_linesizes(pFmtLineSize, pFmt, videoCodecContext->width);
     videoFrame.reset(AVFrameConstructor());
-    if(flushFlag) avcodec_flush_buffers(videoCodecContext.get());
+    if (flushFlag) avcodec_flush_buffers(videoCodecContext.get());
 
-    for (unsigned int n = 0; n < jointData.videoBufferQueue ; ++n)
-      videoBuffers.push_back({std::vector<std::byte>(
-                               static_cast<unsigned int>(
-                                 videoCodecContext->height*videoCodecContext->width*pixelBytes)),0});
+    for (unsigned int n = 0; n < jointData.videoBufferQueue; ++n)
+      videoBuffers.push_back({std::vector<std::byte>(static_cast<unsigned int>(videoCodecContext->height *
+                                                                               videoCodecContext->width * pixelBytes)),
+                              0});
 
-    for( auto& buffer : videoBuffers)
-      pushToQueue(&buffer, videoQueueReturn);
+    for (auto &buffer : videoBuffers) pushToQueue(&buffer, videoQueueReturn);
   }
 
-private:
+ private:
   void decodeVideo() {
     try {
       videoBuffer *finalFrame = nullptr;
-      AVPacket* pkt = nullptr;
+      AVPacket *pkt = nullptr;
       while (1) {
         if (!finalFrame) finalFrame = popFromQueue(videoQueueReturn);
         if (!finalFrame) threadWait(videoQueueReturnMutex, videoQueueReturnCV, videoQueueReturn, jointData.endFlag);
-        if(jointData.endFlag.load()) break;
-        if (!pkt) pkt = popFromQueue<AVPacket*>(jointData.packetVideoQueueSend);
-        if (!pkt) threadWait(jointData.packetVideoQueueSendMutex, jointData.packetVideoQueueSendCV, jointData.packetVideoQueueSend, jointData.endFlag);
-        if(jointData.endFlag.load()) break;
-        if(pkt != nullptr && finalFrame != nullptr) {
-            avcodec_send_packet(videoCodecContext.get(), pkt);
-            pushToQueue<AVPacket*>(pkt,jointData.packetQueueReturn);
-            pkt = nullptr;
-            threadNotify(jointData.packetQueueReturnMutex, jointData.packetQueueReturnCV);
-            while (1) {
-                int ret = avcodec_receive_frame(videoCodecContext.get(), videoFrame.get());
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
-                uint8_t* buf = reinterpret_cast<uint8_t*>(finalFrame->buffer.data());
-                sws_scale(scaleContext.get(), videoFrame->data, videoFrame->linesize, 0,
-                          videoCodecContext->height, &buf,
-                          pFmtLineSize);
-                finalFrame->ptsXtimeBase_ms = (videoFrame->pts*timeBase.num*1000)/timeBase.den;
-                pushToQueue(finalFrame, videoQueueSend);
-                finalFrame = nullptr;
+        if (jointData.endFlag.load()) break;
+        if (!pkt) pkt = popFromQueue<AVPacket *>(jointData.packetVideoQueueSend);
+        if (!pkt)
+          threadWait(jointData.packetVideoQueueSendMutex, jointData.packetVideoQueueSendCV,
+                     jointData.packetVideoQueueSend, jointData.endFlag);
+        if (jointData.endFlag.load()) break;
+        if (pkt != nullptr && finalFrame != nullptr) {
+          avcodec_send_packet(videoCodecContext.get(), pkt);
+          pushToQueue<AVPacket *>(pkt, jointData.packetQueueReturn);
+          pkt = nullptr;
+          threadNotify(jointData.packetQueueReturnMutex, jointData.packetQueueReturnCV);
+          while (1) {
+            int ret = avcodec_receive_frame(videoCodecContext.get(), videoFrame.get());
+            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
+            uint8_t *buf = reinterpret_cast<uint8_t *>(finalFrame->buffer.data());
+            sws_scale(scaleContext.get(), videoFrame->data, videoFrame->linesize, 0, videoCodecContext->height, &buf,
+                      pFmtLineSize);
+            finalFrame->ptsXtimeBase_ms = (videoFrame->pts * timeBase.num * 1000) / timeBase.den;
+            pushToQueue(finalFrame, videoQueueSend);
+            finalFrame = nullptr;
           }
         }
       }
     } catch (...) {
       const std::lock_guard<std::mutex> lock(exceptionPtrMutex);
-      if(!exceptionFlag.load()) {
+      if (!exceptionFlag.load()) {
         exceptionFlag.exchange(true);
-        if(!exceptionPtr) exceptionPtr = std::current_exception();
-        }
+        if (!exceptionPtr) exceptionPtr = std::current_exception();
+      }
       end();
     }
   }
 
-  void end() {
-      jointData.endFlag.exchange(true);
-  }
-public:
+  void end() { jointData.endFlag.exchange(true); }
+
+ public:
   std::exception_ptr getExceptionPtr() const {
-    if(!exceptionFlag.load()) return nullptr;
+    if (!exceptionFlag.load()) return nullptr;
     const std::lock_guard<std::mutex> lock(exceptionPtrMutex);
-    if(exceptionPtr) return exceptionPtr;
-    else return nullptr;
+    if (exceptionPtr)
+      return exceptionPtr;
+    else
+      return nullptr;
   }
 
   playerVideoDec(const playerVideoDec &other) = delete;
   playerVideoDec &operator=(const playerVideoDec &other) = delete;
   playerVideoDec(playerVideoDec &&other) noexcept = delete;
   playerVideoDec &operator=(playerVideoDec &&other) noexcept = delete;
-  ~playerVideoDec() noexcept {
-    end();
-  }
+  ~playerVideoDec() noexcept { end(); }
 
-private:
-  engineJointData& jointData;
+ private:
+  engineJointData &jointData;
   AVRational timeBase;
   int pixelBytes;
   uPtrAVCodecContext videoCodecContext;
@@ -118,8 +115,8 @@ private:
   int pFmtLineSize[4];
   uPtrAVFrame videoFrame;
   std::vector<videoBuffer> videoBuffers;
-  boost::lockfree::spsc_queue<videoBuffer*> videoQueueSend;
-  boost::lockfree::spsc_queue<videoBuffer*> videoQueueReturn;
+  boost::lockfree::spsc_queue<videoBuffer *> videoQueueSend;
+  boost::lockfree::spsc_queue<videoBuffer *> videoQueueReturn;
   mutable std::mutex videoQueueReturnMutex;
   std::condition_variable videoQueueReturnCV;
   std::exception_ptr exceptionPtr;
@@ -127,6 +124,6 @@ private:
   std::atomic<bool> exceptionFlag;
 };
 
-} // namespace Mk02
+}  // namespace Mk02
 
 #endif

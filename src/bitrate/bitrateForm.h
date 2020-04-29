@@ -1,38 +1,38 @@
 #ifndef BITRATEFORM_H
 #define BITRATEFORM_H
 
-
-#include "Mk03/engineContainer.h"
-#include "syncedAudioIO.h"
-#include <QWidget>
 #include <QAudioOutput>
 #include <QByteArray>
 #include <QComboBox>
 #include <QIODevice>
-#include <QTime>
 #include <QString>
-#include <thread>
+#include <QTime>
 #include <QTimer>
+#include <QWidget>
+#include <thread>
+#include "Mk03/engineContainer.h"
 #include "playbackForm.h"
 #include "qcustomplot.h"
 
 namespace Ui {
-  class bitrateForm;
+class bitrateForm;
 }
 
-class bitrateForm : public QWidget
-{
+class bitrateForm : public QWidget {
   Q_OBJECT
 
-public:
-  bitrateForm(QString& mMediaSource, QWidget *parent = nullptr);
-  bitrateForm(std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> aPlayerEngine, QString& mMediaSource, QWidget *parent = nullptr);
+  friend class bitratetest;
+
+ public:
+  bitrateForm(QString& aMediaSource, QWidget* parent = nullptr);
+  bitrateForm(std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> aPlayerEngine,
+                         QString& aMediaSource, QWidget* parent = nullptr);
   ~bitrateForm();
 
-signals:
+ signals:
   void play(bool flag);
 
-private slots:
+ private slots:
   void on_playButton_clicked();
 
   void on_pauseButton_clicked();
@@ -45,11 +45,11 @@ private slots:
 
   void on_progressSlider_sliderReleased();
 
-private:
-  void paintEvent(QPaintEvent *event) override;
+ private:
+  void paintEvent(QPaintEvent* event) override;
   void audioStateChange(QAudio::State state);
   void setProgress(int64_t pts);
-  void setStreams(int a, int v, int64_t seek_pts = -1);
+  void setStreams(int audioID, int videoID, int64_t seek_ms = -1);
   void initAudio();
 
   std::string mMediaSource;
@@ -65,8 +65,8 @@ private:
   int sumOfpktSizes;
   int secondsElapsed;
   int frameCount;
-  QCPBars *bitrateBars;
-  Ui::bitrateForm *ui;
+  QCPBars* bitrateBars;
+  Ui::bitrateForm* ui;
 };
 
-#endif // BITRATEFORM_H
+#endif  // BITRATEFORM_H

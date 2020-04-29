@@ -25,35 +25,23 @@ INCLUDE_DIRECTORIES("${MAINFOLDER}/src/ffmpegUtil")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/qtWidgets")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/qtWidgetsInterface")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/bitrate")
+INCLUDE_DIRECTORIES("${MAINFOLDER}/src/playback")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/src/playerEngine")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty/mySpsc")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty/qcustomplot")
-
+INCLUDE_DIRECTORIES("${MAINFOLDER}/src/metadata")
 INCLUDE_DIRECTORIES("${MAINFOLDER}/thirdParty/catch") #catch.hpp
-
 ## example project Sources
 FILE(GLOB_RECURSE EXAMPLE_SRCS01 ${MAINFOLDER}/src/*.cpp ${MAINFOLDER}/src/qtWidgets/*.ui ${MAINFOLDER}/src/qtWidgets/*.qrc ${MAINFOLDER}/thirdParty/qcustomplot/qcustomplot.cpp)
 
-find_package(Qt5 COMPONENTS Widgets PrintSupport Network Multimedia REQUIRED)
+find_package(Qt5 COMPONENTS Widgets PrintSupport Network Multimedia Concurrent REQUIRED)
 
 if(Qt5Widgets_FOUND)
     message("-- Found Qt5")
 else()
   MESSAGE(WARNING "-> Qt5 not found")
 endif()
-
-
-## Project Dependencies
-
-#SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ~/boost/include)
-#SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ~/boost/lib)
-## Project Dependencies
-#find_package(Boost REQUIRED COMPONENTS system program_options regex filesystem)
-#INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-#LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-#INCLUDE_DIRECTORIES(~/boost/include)
-#LINK_DIRECTORIES(~/boost/lib)
 
 find_package(PkgConfig REQUIRED)
 
@@ -117,9 +105,9 @@ ELSE()
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -std=c++1z -g -march=native -pthread")
 ENDIF()
 
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ## Creating Binaries for examples
-SET(PROJECT_LIBS ${CMAKE_DL_LIBS} Qt5::Widgets Qt5::Network Qt5::Multimedia Qt5::PrintSupport ${FFMPEG_LIBRARIES_TMP}) 
+SET(PROJECT_LIBS ${CMAKE_DL_LIBS} Qt5::Widgets Qt5::Network Qt5::Multimedia Qt5::PrintSupport Qt5::Concurrent ${FFMPEG_LIBRARIES_TMP}) 
 
 SET(EXAMPLE1_NAME ${APPLICATION_NAME})
 SET(EXAMPLE1_BIN ${EXAMPLE1_NAME})
@@ -129,20 +117,4 @@ TARGET_LINK_LIBRARIES(${EXAMPLE1_BIN} ${PROJECT_LIBS})
 
 INSTALL(TARGETS ${EXAMPLE1_BIN} DESTINATION bin)
 
-#set(BUILD_TESTING true CACHE BOOL "Enable building of tests")
 
-macro(create_test TARGET_NAME SOURCE SOURCE2 DEPENDENCIES)
-    add_executable(${TARGET_NAME} ${SOURCE} ${SOURCE2})
-    target_link_libraries(
-        ${TARGET_NAME}
-        ${DEPENDENCIES}
-        catchMain
-        )
-endmacro()
-
-if (BUILD_TESTING)
-    ADD_LIBRARY(catchMain ./tests/00CatchMain.cpp)
-    enable_testing()
-    create_test(test_avDumpFormat ./tests/test_avDumpFormat.cpp ${EXAMPLE_SRCS01} ${PROJECT_LIBS})
-    create_test(test_avDumpFormat2 ./tests/test_avDumpFormat.cpp ${EXAMPLE_SRCS01} ${PROJECT_LIBS})
-endif (BUILD_TESTING)

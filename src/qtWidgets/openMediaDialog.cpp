@@ -1,16 +1,12 @@
 #include "openMediaDialog.h"
-#include "ui_openMediaDialog.h"
-#include "mainWindow.h"
 #include <QFileDialog>
+#include "ui_openMediaDialog.h"
 
-openMediaDialog::openMediaDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::openMediaDialog) {
+openMediaDialog::openMediaDialog(QWidget *parent) : QDialog(parent), ui(new Ui::openMediaDialog) {
   ui->setupUi(this);
 }
 
-openMediaDialog::~openMediaDialog()
-{
+openMediaDialog::~openMediaDialog() {
   delete ui;
 }
 
@@ -19,18 +15,12 @@ void openMediaDialog::on_buttonBox_accepted() {
   disconnect(this, nullptr, nullptr, nullptr);
 }
 
-void openMediaDialog::setMediaSource(QString aString)
-{
+void openMediaDialog::setMediaSource(const QString& aString) {
   ui->lineEdit->setText(aString);
 }
 
-void openMediaDialog::on_toolButton_clicked()
-{
-  QString fileName = QFileDialog::getOpenFileName(this,
-                              tr("Open Local file"),
-                              ui->lineEdit->text(),
-                              tr("All Files (*);;mp4 Files (*.mp4)")
-                              );
-  if (!fileName.isEmpty())
-      ui->lineEdit->setText(fileName);
+void openMediaDialog::on_toolButton_clicked() {
+  QString fileName = QFileDialog::getOpenFileName(this, tr("Open Local file"), ui->lineEdit->text(),
+                                                  tr("All Files (*);;mp4 Files (*.mp4)"));
+  if (!fileName.isEmpty()) ui->lineEdit->setText(fileName);
 }

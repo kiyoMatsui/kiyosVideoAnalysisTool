@@ -1,0 +1,4 @@
+*.pro.user
+*.vscode
+node_modules
+dist

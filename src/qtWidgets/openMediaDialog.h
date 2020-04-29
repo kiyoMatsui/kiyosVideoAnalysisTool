@@ -7,27 +7,28 @@ namespace Ui {
 class openMediaDialog;
 }
 
-class openMediaDialog final : public QDialog
-{
+class openMediaDialog final : public QDialog {
   Q_OBJECT
 
-public:
+  friend class openmediatest;
+
+ public:
   explicit openMediaDialog(QWidget *parent = 0);
   ~openMediaDialog();
 
-public slots:
-  void setMediaSource(QString aString);
+ public slots:
+  void setMediaSource(const QString& aString);
 
-signals:
+ signals:
   void returnMediaSource(QString aMediaSource);
 
-private slots:
+ private slots:
   void on_buttonBox_accepted();
 
   void on_toolButton_clicked();
 
-private:
+ private:
   Ui::openMediaDialog *ui;
 };
 
-#endif // OPENMEDIADIALOG_H
+#endif  // OPENMEDIADIALOG_H

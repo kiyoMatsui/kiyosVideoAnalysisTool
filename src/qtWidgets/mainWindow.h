@@ -33,27 +33,6 @@ class asyncMembers {
   std::atomic<bool> clickedFlag;
 };
 
-template <typename T>
-class asyncMembers {
-public:
-  explicit asyncMembers(unsigned int& aCounter)
-    : counter(aCounter)
-    , exceptionPtr(nullptr)
-    , watcher()
-    , clickedFlag(false) {
-  }
-  void reset() {
-    counter--;
-    clickedFlag.exchange(false);
-    exceptionPtr = nullptr;
-  }
-
-  unsigned int& counter;
-  std::exception_ptr exceptionPtr;
-  QFutureWatcher<T> watcher;
-  std::atomic<bool> clickedFlag;
-};
-
 namespace Ui {
 class mainWindow;
 }

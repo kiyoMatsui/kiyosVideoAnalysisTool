@@ -2,6 +2,7 @@
 #include <QtTest>
 
 #include "openMediaDialog.h"
+#include "ui_openMediaDialog.h"
 
 class openmediatest : public QObject {
   Q_OBJECT
@@ -43,6 +44,7 @@ void openmediatest::test_case1() {
   QApplication::setActiveWindow(mDialog);
   mDialog->setMediaSource(testString);
   mDialog->on_buttonBox_accepted();
+  QCOMPARE(mDialog->ui->lineEdit->text(), QString(" test String   "));
   QCOMPARE(testString, QString("test String"));
 }
 

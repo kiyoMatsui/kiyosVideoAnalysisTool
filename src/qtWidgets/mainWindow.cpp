@@ -73,21 +73,6 @@ void mainWindow::on_actionOpenMedia_triggered() {
   }
 }
 
-void mainWindow::on_actionOpenMedia_triggered() {
-  try {
-    openMediaDialog* mediaDialog = new openMediaDialog(this);
-    connect(this, &mainWindow::sendMediaSource, mediaDialog, &openMediaDialog::setMediaSource);
-    connect(mediaDialog, &openMediaDialog::returnMediaSource, this, &mainWindow::setMediaSource);
-    emit sendMediaSource(mMediaSource);
-    mediaDialog->show();
-    disconnect(this, &mainWindow::sendMediaSource, mediaDialog, &openMediaDialog::setMediaSource);
-  } catch(const std::exception& e) {
-    stdExceptionDialog(this, e) == true ? on_actionOpenMedia_triggered() : (void)0 ;
-  } catch(...) {
-    catchAllExceptionDialog(this) == true ? on_actionOpenMedia_triggered() : (void)0 ;
-  }
-}
-
 void mainWindow::on_actionMetadata_triggered() {
   if (!on_actionMetadata_triggeredAM.clickedFlag.load()) {
     // safe as long as slots are syncronised (they are!).

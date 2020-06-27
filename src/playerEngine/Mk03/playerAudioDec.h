@@ -38,8 +38,9 @@ class playerAudioDec {
     avcodec_parameters_to_context(audioCodecContext.get(), afc->streams[jointData.audioStreamIndex]->codecpar);
     avcodec_open2(audioCodecContext.get(), audioCodec, nullptr);
     resampleContext.reset(SwrContextConstructor());
-    av_opt_set_int(resampleContext.get(), "in_channel_layout", audioCodecContext->channel_layout, 0);
-    av_opt_set_int(resampleContext.get(), "out_channel_layout", audioCodecContext->channel_layout, 0);
+    auto channelLayout = fixChannelLayout();
+    av_opt_set_int(resampleContext.get(), "in_channel_layout", channelLayout, 0);
+    av_opt_set_int(resampleContext.get(), "out_channel_layout", channelLayout, 0);
     av_opt_set_int(resampleContext.get(), "in_sample_rate", audioCodecContext->sample_rate, 0);
     av_opt_set_int(resampleContext.get(), "out_sample_rate", audioCodecContext->sample_rate, 0);
     av_opt_set_sample_fmt(resampleContext.get(), "in_sample_fmt", audioCodecContext->sample_fmt, 0);
@@ -106,6 +107,13 @@ class playerAudioDec {
       return exceptionPtr;
     else
       return nullptr;
+  }
+  uint64_t fixChannelLayout() const {
+    if(audioCodecContext->channel_layout == 0) {
+      return av_get_default_channel_layout(audioCodecContext->channels);
+    } else {
+      return audioCodecContext->channel_layout;
+    }
   }
 
   playerAudioDec(const playerAudioDec &other) = delete;

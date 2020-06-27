@@ -21,7 +21,7 @@ class playerAudioDec {
   friend class engineContainer;
 
  public:
-  playerAudioDec(engineJointData &ejd, uPtrAVFormatContext &afc, AVSampleFormat sFmt, bool flushFlag)
+  playerAudioDec(engineJointData& ejd, uPtrAVFormatContext& afc, AVSampleFormat sFmt, bool flushFlag)
       : jointData(ejd),
         timeBase(afc->streams[jointData.audioStreamIndex]->time_base),
         sampleBytes(av_get_bytes_per_sample(sFmt)),
@@ -52,33 +52,33 @@ class playerAudioDec {
       audioBuffers.push_back({std::vector<std::byte>(static_cast<unsigned int>(
                                 jointData.maxAudioFrameSampleNo * audioCodecContext->channels * sampleBytes)),
                               0, 0});
-    for (auto &buffer : audioBuffers) pushToQueue(&buffer, audioQueueReturn);
+    for (auto& buffer : audioBuffers) pushToQueue(&buffer, audioQueueReturn);
   }
 
  private:
   void decodeAudio() {
     try {
-      audioBuffer *temp = nullptr;
-      AVPacket *pkt = nullptr;
+      audioBuffer* temp = nullptr;
+      AVPacket* pkt = nullptr;
       while (1) {
         if (!temp) temp = popFromQueue(audioQueueReturn);
         if (!temp) threadWait(audioQueueReturnMutex, audioQueueReturnCV, audioQueueReturn, jointData.endFlag);
         if (jointData.endFlag.load()) break;
-        if (!pkt) pkt = popFromQueue<AVPacket *>(jointData.packetAudioQueueSend);
+        if (!pkt) pkt = popFromQueue<AVPacket*>(jointData.packetAudioQueueSend);
         if (!pkt)
           threadWait(jointData.packetAudioQueueSendMutex, jointData.packetAudioQueueSendCV,
                      jointData.packetAudioQueueSend, jointData.endFlag);
         if (jointData.endFlag.load()) break;
         if (pkt != nullptr && temp != nullptr) {
           avcodec_send_packet(audioCodecContext.get(), pkt);
-          pushToQueue<AVPacket *>(pkt, jointData.packetQueueReturn);
+          pushToQueue<AVPacket*>(pkt, jointData.packetQueueReturn);
           pkt = nullptr;
           threadNotify(jointData.packetQueueReturnMutex, jointData.packetQueueReturnCV);
           while (1) {
             int ret = avcodec_receive_frame(audioCodecContext.get(), audioFrame.get());
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) break;
-            uint8_t *buf = reinterpret_cast<uint8_t *>(temp->buffer.data());
-            swr_convert(resampleContext.get(), &buf, audioFrame->nb_samples, (const uint8_t **)(audioFrame->data),
+            uint8_t* buf = reinterpret_cast<uint8_t*>(temp->buffer.data());
+            swr_convert(resampleContext.get(), &buf, audioFrame->nb_samples, (const uint8_t**)(audioFrame->data),
                         audioFrame->nb_samples);
             temp->ptsXtimeBase_ms = (audioFrame->pts * timeBase.num * 1000) / timeBase.den;
             temp->nbSamples = audioFrame->nb_samples;
@@ -103,35 +103,37 @@ class playerAudioDec {
   std::exception_ptr getExceptionPtr() const {
     if (!exceptionFlag.load()) return nullptr;
     const std::lock_guard<std::mutex> lock(exceptionPtrMutex);
-    if (exceptionPtr)
+    if (exceptionPtr) {
       return exceptionPtr;
-    else
+    } else {
       return nullptr;
+    }
   }
+
   uint64_t fixChannelLayout() const {
-    if(audioCodecContext->channel_layout == 0) {
+    if (audioCodecContext->channel_layout == 0) {
       return av_get_default_channel_layout(audioCodecContext->channels);
     } else {
       return audioCodecContext->channel_layout;
     }
   }
 
-  playerAudioDec(const playerAudioDec &other) = delete;
-  playerAudioDec &operator=(const playerAudioDec &other) = delete;
-  playerAudioDec(playerAudioDec &&other) noexcept = delete;
-  playerAudioDec &operator=(playerAudioDec &&other) noexcept = delete;
+  playerAudioDec(const playerAudioDec& other) = delete;
+  playerAudioDec& operator=(const playerAudioDec& other) = delete;
+  playerAudioDec(playerAudioDec&& other) noexcept = delete;
+  playerAudioDec& operator=(playerAudioDec&& other) noexcept = delete;
   ~playerAudioDec() noexcept { end(); }
 
  private:
-  engineJointData &jointData;
+  engineJointData& jointData;
   AVRational timeBase;
   int sampleBytes;
   uPtrAVCodecContext audioCodecContext;
   uPtrSwrContext resampleContext;
   uPtrAVFrame audioFrame;
   std::vector<audioBuffer> audioBuffers;
-  boost::lockfree::spsc_queue<audioBuffer *> audioQueueSend;
-  boost::lockfree::spsc_queue<audioBuffer *> audioQueueReturn;
+  boost::lockfree::spsc_queue<audioBuffer*> audioQueueSend;
+  boost::lockfree::spsc_queue<audioBuffer*> audioQueueReturn;
   mutable std::mutex audioQueueReturnMutex;
   std::condition_variable audioQueueReturnCV;
   std::exception_ptr exceptionPtr;

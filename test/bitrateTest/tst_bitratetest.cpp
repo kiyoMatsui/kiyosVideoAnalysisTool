@@ -4,6 +4,7 @@
 #include "Mk03/engineContainer.h"
 #include "bitrateForm.h"
 #include "playbackForm.h"
+#include "ui_bitrateForm.h"
 
 class bitratetest : public QObject {
   Q_OBJECT
@@ -39,7 +40,7 @@ void bitratetest::initTestCase() {
   mediaSource = "./../../../kiyosVideoAnalysisTool/test/video.mp4";
   try {
     mediaSourceQs = mediaSource.c_str();
-    mDialog = new bitrateForm(mediaSourceQs);
+    mDialog = new bitrateForm(std::make_shared<Mk03::engineContainer<Mk03::bitrateAnalysis>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT), mediaSourceQs);
   } catch (...) {
     QFAIL("probably can't find video.mp4 (wrong path)");
   }
@@ -51,6 +52,7 @@ void bitratetest::cleanupTestCase() {
 }
 
 void bitratetest::testControls() {
+  QSignalSpy sigspy(mDialog, &bitrateForm::play);
   mDialog->on_playButton_clicked();
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
   mDialog->on_pauseButton_clicked();
@@ -59,6 +61,9 @@ void bitratetest::testControls() {
   QCOMPARE(mDialog->mPlayerState, playerState::stopped);
   mDialog->on_playButton_clicked();
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
+  mDialog->on_stopButton_clicked();
+  QCOMPARE(mDialog->mPlayerState, playerState::stopped);
+  QCOMPARE(sigspy.count(), 2);
 }
 
 QTEST_MAIN(bitratetest)

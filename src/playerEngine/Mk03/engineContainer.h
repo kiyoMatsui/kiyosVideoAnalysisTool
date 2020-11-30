@@ -71,6 +71,9 @@ class engineContainer {
     } else {
       jointData.videoStreamIndex = -1;
     }
+    if (jointData.videoStreamIndex < 0) {
+      throw std::invalid_argument("noVideoStream");
+    }
     bool flushFlag = false;
     if (seek_pts >= 0) {
       av_seek_frame(fc.get(), jointData.videoStreamIndex, seek_pts, AVSEEK_FLAG_ANY);

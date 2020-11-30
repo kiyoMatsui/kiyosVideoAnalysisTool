@@ -4,40 +4,6 @@
 #include "selectStreamDialog_copy1.h"
 #include "ui_bitrateForm.h"
 
-bitrateForm::bitrateForm(QString& aMediaSource, QWidget* parent)
-    : QWidget(parent),
-      mMediaSource(aMediaSource.toStdString()),
-      mFrames(0),
-      mPlayerState(playerState::stopped),
-      sliderHeldDown(false),
-      sizeFlag(false),
-      playerEngine(
-        new Mk03::engineContainer<Mk03::bitrateAnalysis>(mMediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT)),
-      fpsInterval(1.0 / playerEngine->getFps()),
-      sumOfFpsInterval(0.0),
-      sumOfpktSizes(0),
-      secondsElapsed(0),
-      frameCount(0),
-      bitrateBars(nullptr),
-      ui(new Ui::bitrateForm) {
-  ui->setupUi(this);
-  playerEngine->startThreads();
-  ui->progressSlider->setRange(0, playerEngine->getDuration());
-  ui->progressSlider->setSliderPosition(0);
-
-  QLinearGradient gradient(0, 0, 0, 400);
-  gradient.setColorAt(0, QColor(190, 190, 190));
-  gradient.setColorAt(0.38, QColor(205, 205, 205));
-  gradient.setColorAt(1, QColor(170, 170, 170));
-  ui->customPlot->setBackground(QBrush(gradient));
-  bitrateBars = new QCPBars(ui->customPlot->xAxis, ui->customPlot->yAxis);
-
-  ui->customPlot->xAxis->setLabel("Seconds");
-  ui->customPlot->yAxis->setLabel("Bitrate (kbps)");
-  ui->customPlot->xAxis->setRange(0, 60);
-  ui->customPlot->yAxis->setRange(0, 2 * (playerEngine->getVideoBitrate() / 1000));
-}
-
 bitrateForm::bitrateForm(std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> aPlayerEngine,
                          QString& aMediaSource, QWidget* parent)
     : QWidget(parent),

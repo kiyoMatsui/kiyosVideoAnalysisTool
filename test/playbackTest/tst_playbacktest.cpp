@@ -3,6 +3,7 @@
 
 #include "Mk03/engineContainer.h"
 #include "playbackForm.h"
+#include "ui_playbackForm.h"
 
 class playbacktest : public QObject {
   Q_OBJECT
@@ -31,7 +32,7 @@ void playbacktest::initTestCase() {
   mediaSource = "./../../../kiyosVideoAnalysisTool/test/video.mp4";
   try {
     mediaSourceQs = mediaSource.c_str();
-    mDialog = new playbackForm(mediaSourceQs);
+    mDialog = new playbackForm(std::make_shared<Mk03::engineContainer<>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT), mediaSourceQs);
   } catch (...) {
     QFAIL("probably can't find video.mp4 (wrong path)");
   }
@@ -39,11 +40,14 @@ void playbacktest::initTestCase() {
 }
 
 void playbacktest::cleanupTestCase() {
+  mDialog->playerEngine->end();
   delete mDialog;
 }
 
 void playbacktest::testControls() {
-  mDialog->on_playButton_clicked();
+  QSignalSpy sigspy(mDialog, &playbackForm::play);
+  //mDialog->on_playButton_clicked();
+  QTest::mouseClick(mDialog->ui->playButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
   mDialog->on_pauseButton_clicked();
   QCOMPARE(mDialog->mPlayerState, playerState::paused);
@@ -51,6 +55,9 @@ void playbacktest::testControls() {
   QCOMPARE(mDialog->mPlayerState, playerState::stopped);
   mDialog->on_playButton_clicked();
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
+  mDialog->on_stopButton_clicked();
+  QCOMPARE(mDialog->mPlayerState, playerState::stopped);
+  QCOMPARE(sigspy.count(), 2);
 }
 
 QTEST_MAIN(playbacktest)

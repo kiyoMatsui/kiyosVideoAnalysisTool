@@ -24,7 +24,6 @@ class bitrateForm : public QWidget {
   friend class bitratetest;
 
  public:
-  bitrateForm(QString& aMediaSource, QWidget* parent = nullptr);
   bitrateForm(std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> aPlayerEngine,
                          QString& aMediaSource, QWidget* parent = nullptr);
   ~bitrateForm();

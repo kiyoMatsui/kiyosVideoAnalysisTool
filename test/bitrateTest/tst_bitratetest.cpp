@@ -22,7 +22,7 @@ class bitratetest : public QObject {
   void testControls();
 
  private:
-  std::shared_ptr<Mk03::engineContainer<>> pePtr;
+  std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> pePtr;
   bitrateForm* mDialog;
   std::string mediaSource;
   QString mediaSourceQs;
@@ -39,8 +39,9 @@ bitratetest::~bitratetest() {}
 void bitratetest::initTestCase() {
   mediaSource = "./../../../kiyosVideoAnalysisTool/test/video.mp4";
   try {
-    mediaSourceQs = mediaSource.c_str();
-    mDialog = new bitrateForm(std::make_shared<Mk03::engineContainer<Mk03::bitrateAnalysis>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT), mediaSourceQs);
+    pePtr = std::make_shared<Mk03::engineContainer<Mk03::bitrateAnalysis>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT);
+    mediaSourceQs = QString(mediaSource.c_str());
+    mDialog = new bitrateForm(pePtr, mediaSourceQs);
   } catch (...) {
     QFAIL("probably can't find video.mp4 (wrong path)");
   }
@@ -52,16 +53,13 @@ void bitratetest::cleanupTestCase() {
 }
 
 void bitratetest::testControls() {
+  QApplication::setActiveWindow(mDialog);
   QSignalSpy sigspy(mDialog, &bitrateForm::play);
-  mDialog->on_playButton_clicked();
+  QTest::mouseClick(mDialog->ui->playButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
-  mDialog->on_pauseButton_clicked();
+  QTest::mouseClick(mDialog->ui->pauseButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::paused);
-  mDialog->on_stopButton_clicked();
-  QCOMPARE(mDialog->mPlayerState, playerState::stopped);
-  mDialog->on_playButton_clicked();
-  QCOMPARE(mDialog->mPlayerState, playerState::playing);
-  mDialog->on_stopButton_clicked();
+  QTest::mouseClick(mDialog->ui->stopButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::stopped);
   QCOMPARE(sigspy.count(), 2);
 }

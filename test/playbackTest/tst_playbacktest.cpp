@@ -31,8 +31,9 @@ playbacktest::~playbacktest() {}
 void playbacktest::initTestCase() {
   mediaSource = "./../../../kiyosVideoAnalysisTool/test/video.mp4";
   try {
-    mediaSourceQs = mediaSource.c_str();
-    mDialog = new playbackForm(std::make_shared<Mk03::engineContainer<>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT), mediaSourceQs);
+    pePtr = std::make_shared<Mk03::engineContainer<>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT);
+    mediaSourceQs = QString(mediaSource.c_str());
+    mDialog = new playbackForm(pePtr, mediaSourceQs);
   } catch (...) {
     QFAIL("probably can't find video.mp4 (wrong path)");
   }
@@ -40,22 +41,17 @@ void playbacktest::initTestCase() {
 }
 
 void playbacktest::cleanupTestCase() {
-  mDialog->playerEngine->end();
   delete mDialog;
 }
 
 void playbacktest::testControls() {
+  QApplication::setActiveWindow(mDialog);
   QSignalSpy sigspy(mDialog, &playbackForm::play);
-  //mDialog->on_playButton_clicked();
   QTest::mouseClick(mDialog->ui->playButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
-  mDialog->on_pauseButton_clicked();
+  QTest::mouseClick(mDialog->ui->pauseButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::paused);
-  mDialog->on_stopButton_clicked();
-  QCOMPARE(mDialog->mPlayerState, playerState::stopped);
-  mDialog->on_playButton_clicked();
-  QCOMPARE(mDialog->mPlayerState, playerState::playing);
-  mDialog->on_stopButton_clicked();
+  QTest::mouseClick(mDialog->ui->stopButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::stopped);
   QCOMPARE(sigspy.count(), 2);
 }

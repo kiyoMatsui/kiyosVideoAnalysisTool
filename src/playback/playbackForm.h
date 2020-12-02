@@ -22,7 +22,6 @@ class playbackForm final : public QWidget {
   friend class playbacktest;
 
  public:
-  playbackForm(QString &aMediaSource, QWidget *parent = nullptr);
   playbackForm(std::shared_ptr<Mk03::engineContainer<>> aPlayerEngine, QString &aMediaSource,
                QWidget *parent = nullptr);
   ~playbackForm();

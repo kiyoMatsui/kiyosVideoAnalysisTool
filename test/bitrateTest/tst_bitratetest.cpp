@@ -4,12 +4,10 @@
 #include "Mk03/engineContainer.h"
 #include "bitrateForm.h"
 #include "playbackForm.h"
+#include "ui_bitrateForm.h"
 
 class bitratetest : public QObject {
   Q_OBJECT
-
- public slots:
-  void setString(const QString& aString);
 
  public:
   bitratetest();
@@ -21,15 +19,11 @@ class bitratetest : public QObject {
   void testControls();
 
  private:
-  std::shared_ptr<Mk03::engineContainer<>> pePtr;
+  std::shared_ptr<Mk03::engineContainer<Mk03::bitrateAnalysis>> pePtr;
   bitrateForm* mDialog;
   std::string mediaSource;
   QString mediaSourceQs;
 };
-
-void bitratetest::setString(const QString& aString) {
-  mediaSourceQs = aString;
-}
 
 bitratetest::bitratetest() {}
 
@@ -38,8 +32,10 @@ bitratetest::~bitratetest() {}
 void bitratetest::initTestCase() {
   mediaSource = "./../../../kiyosVideoAnalysisTool/test/video.mp4";
   try {
-    mediaSourceQs = mediaSource.c_str();
-    mDialog = new bitrateForm(mediaSourceQs);
+    pePtr = std::make_shared<Mk03::engineContainer<Mk03::bitrateAnalysis>>(mediaSource, AV_PIX_FMT_YUV420P, AV_SAMPLE_FMT_FLT);
+    mediaSourceQs = QString(mediaSource.c_str());
+    mDialog = new bitrateForm(pePtr, mediaSourceQs);
+    pePtr->end(); //stop player just test form
   } catch (...) {
     QFAIL("probably can't find video.mp4 (wrong path)");
   }
@@ -51,14 +47,15 @@ void bitratetest::cleanupTestCase() {
 }
 
 void bitratetest::testControls() {
-  mDialog->on_playButton_clicked();
+  QApplication::setActiveWindow(mDialog);
+  QSignalSpy sigspy(mDialog, &bitrateForm::play);
+  QTest::mouseClick(mDialog->ui->playButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::playing);
-  mDialog->on_pauseButton_clicked();
+  QTest::mouseClick(mDialog->ui->pauseButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::paused);
-  mDialog->on_stopButton_clicked();
+  QTest::mouseClick(mDialog->ui->stopButton, Qt::LeftButton);
   QCOMPARE(mDialog->mPlayerState, playerState::stopped);
-  mDialog->on_playButton_clicked();
-  QCOMPARE(mDialog->mPlayerState, playerState::playing);
+  QCOMPARE(sigspy.count(), 2);
 }
 
 QTEST_MAIN(bitratetest)

@@ -22,6 +22,7 @@ namespace Mk03 {
 template <typename T = Mk03::defaultAnalysis>
 class engineContainer {
   friend class ::playerenginetest;
+
  public:
   engineContainer(std::string mediaSourceString, AVPixelFormat aPFmt, AVSampleFormat aSFmt, int useAudioIndex = -42,
                   int useVideoIndex = -42, int64_t seek_pts = -1)
@@ -69,6 +70,9 @@ class engineContainer {
       jointData.videoStreamIndex = useVideoIndex;
     } else {
       jointData.videoStreamIndex = -1;
+    }
+    if (jointData.videoStreamIndex < 0) {
+      throw std::invalid_argument("noVideoStream");
     }
     bool flushFlag = false;
     if (seek_pts >= 0) {

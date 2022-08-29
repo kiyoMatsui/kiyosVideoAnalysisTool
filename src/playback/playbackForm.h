@@ -6,7 +6,7 @@
 #include <QComboBox>
 #include <QIODevice>
 #include <QString>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QWidget>
 #include <thread>
 #include "Mk03/engineContainer.h"
@@ -54,7 +54,7 @@ class playbackForm final : public QWidget {
   void initAudio();
 
   std::string mMediaSource;
-  QTime mTime;
+  QElapsedTimer mTime;
   int mFrames;
   playerState mPlayerState;
   bool sliderHeldDown;

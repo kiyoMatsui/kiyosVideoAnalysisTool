@@ -57,19 +57,6 @@ pkg_check_modules(AVFORMAT "libavformat")
 include_directories(${AVFORMAT_INCLUDE_DIRS})
 link_directories(${AVFORMAT_LIBRARY_DIRS})
 
-pkg_check_modules(AVCODEC "libavcodec")
-#if (AVCODEC_FOUND)
-include_directories(${AVCODEC_INCLUDE_DIRS})
-link_directories(${AVCODEC_LIBRARY_DIRS})
-
-pkg_check_modules(AVUTIL "libavutil")
-include_directories(${AVUTIL_INCLUDE_DIRS})
-link_directories(${AVUTIL_LIBRARY_DIRS})
-
-pkg_check_modules(AVFORMAT REQUIRED "libavformat")
-include_directories(${AVFORMAT_INCLUDE_DIRS})
-link_directories(${AVFORMAT_LIBRARY_DIRS})
-
 pkg_check_modules(AVCODEC REQUIRED "libavcodec")
 include_directories(${AVCODEC_INCLUDE_DIRS})
 link_directories(${AVCODEC_LIBRARY_DIRS})
@@ -78,7 +65,20 @@ pkg_check_modules(AVUTIL REQUIRED "libavutil")
 include_directories(${AVUTIL_INCLUDE_DIRS})
 link_directories(${AVUTIL_LIBRARY_DIRS})
 
-SET(FFMPEG_LIBRARIES_TMP ${AVDEVICE_LIBRARIES} ${AVFILTER_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVCODEC_LIBRARIES} ${AVUTIL_LIBRARIES})
+pkg_check_modules(AVRESAMPLE REQUIRED "libavresample")
+include_directories(${AVRESAMPLE_INCLUDE_DIRS})
+link_directories(${AVRESAMPLE_LIBRARY_DIRS})
+
+pkg_check_modules(SWRESAMPLE REQUIRED "libswresample")
+include_directories(${SWRESAMPLE_INCLUDE_DIRS})
+link_directories(${SWRESAMPLE_LIBRARY_DIRS})
+
+pkg_check_modules(SWSCALE REQUIRED "libswscale")
+include_directories(${SWSCALE_INCLUDE_DIRS})
+link_directories(${SWSCALE_LIBRARY_DIRS})
+
+SET(FFMPEG_LIBRARIES_TMP ${AVUTIL_LIBRARIES} ${AVDEVICE_LIBRARIES} ${AVFILTER_LIBRARIES} ${AVFORMAT_LIBRARIES} ${AVCODEC_LIBRARIES}
+     ${AVRESAMPLE_LIBRARIES} ${SWRESAMPLE_LIBRARIES} ${SWSCALE_LIBRARIES})
 
 ## Configure Files
 FILE(GLOB_RECURSE CONFIGINPUTS1 src/*.h.in.cmake)

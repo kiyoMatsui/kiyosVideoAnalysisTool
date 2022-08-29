@@ -15,6 +15,13 @@
 #include "ffmpegUPtr.h"
 #include "mySpsc/boost/lockfree/spsc_queue.hpp"
 
+//
+extern "C" {
+#include <libavutil/encryption_info.h>
+}
+#include <iostream>
+//
+
 class playerenginetest;
 
 namespace Mk03 {
@@ -41,6 +48,7 @@ class engineContainer {
     threads.emplace_back(&Mk03::playerDemuxer<T>::demux, mPlayerDemuxerPtr.get());
     threads.emplace_back(&Mk03::playerVideoDec<T>::decodeVideo, mPlayerVideoDecPtr.get());
     if (mPlayerAudioDecPtr) threads.emplace_back(&Mk03::playerAudioDec<T>::decodeAudio, mPlayerAudioDecPtr.get());
+
   }
 
  private:
@@ -86,6 +94,7 @@ class engineContainer {
     mPlayerVideoDecPtr.reset(new playerVideoDec<T>(jointData, fc, pFmt, flushFlag));
 
     threads.reserve(3);
+
   }
 
  public:
@@ -145,6 +154,45 @@ class engineContainer {
     std::lock_guard<std::mutex> lck(jointData.playMutex);
     mPlayerDemuxerPtr->playFlag.exchange(false);
     jointData.playCV.notify_one();
+    //
+    //
+    // get AVEncryptionInitInfo should just be the pssh box
+    //
+    /*
+    int side_data_size;
+    const uint8_t* side_data = av_stream_get_side_data(
+        fc->streams[jointData.videoStreamIndex], AV_PKT_DATA_ENCRYPTION_INIT_INFO,
+        &side_data_size);
+      if (!side_data) throw;
+        AVEncryptionInitInfo* info =
+            av_encryption_init_info_get_side_data(side_data, side_data_size);
+
+
+        std::vector<uint8_t> pssh;
+
+        for (auto* cur_info = info; cur_info; cur_info = cur_info->next) {
+          if (cur_info->system_id_size) {
+            const std::vector<uint8_t> temp = CreatePssh(cur_info);
+            pssh.insert(pssh.end(), temp.begin(), temp.end());
+          } else {
+            for (size_t i = 0; i < cur_info->num_key_ids; i++) {
+              client_->OnEncrypted(eme::MediaKeyInitDataType::WebM,
+                                   cur_info->key_ids[i], cur_info->key_id_size);
+            }
+          }
+        }
+        if (!pssh.empty()) {
+          client_->OnEncrypted(eme::MediaKeyInitDataType::Cenc, pssh.data(),
+                               pssh.size());
+        }
+
+        av_stream_remove_side_data(demuxer_ctx_->streams[0],
+                                   AV_PKT_DATA_ENCRYPTION_INIT_INFO);
+      }
+
+
+      av_encryption_init_info_free(info);
+      */
   }
 
   int getStreams() const { return fc->nb_streams; }

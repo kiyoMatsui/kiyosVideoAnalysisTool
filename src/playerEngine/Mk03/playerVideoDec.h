@@ -12,6 +12,13 @@
 #include "ffmpegUPtr.h"
 #include "mySpsc/boost/lockfree/spsc_queue.hpp"
 
+//
+extern "C" {
+#include <libavutil/encryption_info.h>
+}
+#include <iostream>
+//
+
 namespace Mk03 {
 
 template <typename T>
@@ -65,6 +72,34 @@ class playerVideoDec {
                      jointData.packetVideoQueueSend, jointData.endFlag);
         if (jointData.endFlag.load()) break;
         if (pkt != nullptr && finalFrame != nullptr) {
+          //
+          //
+          // print video AVEncryptionInfo
+          //
+
+          try {
+            std::cout << "pkt_pos: " << pkt->pos << std::endl;
+            const uint8_t* side_data = av_packet_get_side_data(
+                pkt, AV_PKT_DATA_ENCRYPTION_INFO, &pkt->side_data->size);
+            if(!side_data) throw;
+            unsigned int currentByte = 0;
+            AVEncryptionInfo* encInfo = av_encryption_info_get_side_data(side_data, static_cast<size_t>(pkt->side_data->size));
+            if(!encInfo) throw;
+            AVSubsampleEncryptionInfo* thePtr = &encInfo->subsamples[0];
+            for(uint32_t num = 0; num < encInfo->subsample_count; ++num) {
+              std::cout << num <<" bytes_of_clear_data pos: " << currentByte <<"\n" ;
+              std::cout << num <<" bytes_of_clear_data: " << thePtr->bytes_of_clear_data <<"\n" ; currentByte+=thePtr->bytes_of_clear_data;
+              std::cout << num <<" bytes_of_protected_data pos: " << currentByte << "\n";
+              std::cout << num <<" bytes_of_protected_data: " << thePtr->bytes_of_protected_data <<"\n" << std::endl; currentByte+=thePtr->bytes_of_protected_data;
+              thePtr++;
+            }
+            av_encryption_info_free(encInfo);
+          }  catch (...) {
+            std::cout << "AVEncryptionInfo print error" << "\n" << std::endl;
+          }
+
+
+
           if constexpr (analysis.bitrate) pktSizeSum += pkt->size;
           avcodec_send_packet(videoCodecContext.get(), pkt);
           pushToQueue<AVPacket*>(pkt, jointData.packetQueueReturn);

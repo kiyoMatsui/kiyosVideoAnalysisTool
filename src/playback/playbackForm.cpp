@@ -75,7 +75,7 @@ void playbackForm::paintEvent(QPaintEvent*) {
   }
   painter.end();
   if (!(mFrames % 100)) {
-    mTime.start();
+    mTime.restart();
     mFrames = 0;
   }
   ++mFrames;

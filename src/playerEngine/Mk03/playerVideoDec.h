@@ -79,12 +79,13 @@ class playerVideoDec {
 
           try {
             std::cout << "pkt_pos: " << pkt->pos << std::endl;
+            if(!pkt->side_data) throw 1;
             const uint8_t* side_data = av_packet_get_side_data(
                 pkt, AV_PKT_DATA_ENCRYPTION_INFO, &pkt->side_data->size);
-            if(!side_data) throw;
+            if(!side_data) throw 1;
             unsigned int currentByte = 0;
             AVEncryptionInfo* encInfo = av_encryption_info_get_side_data(side_data, static_cast<size_t>(pkt->side_data->size));
-            if(!encInfo) throw;
+            if(!encInfo) throw 1;
             AVSubsampleEncryptionInfo* thePtr = &encInfo->subsamples[0];
             for(uint32_t num = 0; num < encInfo->subsample_count; ++num) {
               std::cout << num <<" bytes_of_clear_data pos: " << currentByte <<"\n" ;
@@ -95,7 +96,7 @@ class playerVideoDec {
             }
             av_encryption_info_free(encInfo);
           }  catch (...) {
-            std::cout << "AVEncryptionInfo print error" << "\n" << std::endl;
+            std::cout << "AVEncryptionInfo print error or pkt not encrypted" << "\n" << std::endl;
           }
 
 
